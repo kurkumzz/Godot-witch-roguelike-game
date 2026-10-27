@@ -2,6 +2,7 @@
 
 [ext_resource type="Texture2D" uid="uid://l8pvie3u6s04" path="res://cavetile.png" id="1_vonw3"]
 [ext_resource type="PackedScene" uid="uid://v0kqfkfnkf0y" path="res://player/player.tscn" id="2_oi3di"]
+[ext_resource type="PackedScene" uid="uid://cfq8y8hbuprai" path="res://enemies/base/base_enemy.tscn" id="3_oi3di"]
 
 [sub_resource type="TileSetAtlasSource" id="TileSetAtlasSource_0b4ue"]
 texture = ExtResource("1_vonw3")
@@ -74,3 +75,6 @@ tile_set = SubResource("TileSet_gqrkx")
 
 [node name="Player" parent="." unique_id=1302941866 instance=ExtResource("2_oi3di")]
 position = Vector2(553, 318)
+
+[node name="base_enemy" parent="." unique_id=991394093 instance=ExtResource("3_oi3di")]
+position = Vector2(400, 341)

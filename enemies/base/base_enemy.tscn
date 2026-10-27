@@ -1,0 +1,71 @@
+[gd_scene format=3 uid="uid://cfq8y8hbuprai"]
+
+[ext_resource type="Script" uid="uid://c8cgjvf2ayuav" path="res://enemies/base/base_enemy.gd" id="1_cjhsq"]
+[ext_resource type="Texture2D" uid="uid://0nxvl4mcul11" path="res://player/tempAnim.png" id="2_2or2i"]
+[ext_resource type="Script" uid="uid://d108e6mjjkkii" path="res://enemies/base/state.gd" id="2_qfy1r"]
+
+[sub_resource type="RectangleShape2D" id="RectangleShape2D_1puhw"]
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_d2wqn"]
+atlas = ExtResource("2_2or2i")
+region = Rect2(64, 0, 64, 64)
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_5if36"]
+atlas = ExtResource("2_2or2i")
+region = Rect2(128, 0, 64, 64)
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_susdi"]
+atlas = ExtResource("2_2or2i")
+region = Rect2(192, 0, 64, 64)
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_6uwmj"]
+atlas = ExtResource("2_2or2i")
+region = Rect2(256, 0, 64, 64)
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_pdkj8"]
+atlas = ExtResource("2_2or2i")
+region = Rect2(320, 0, 64, 64)
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_qs6ya"]
+atlas = ExtResource("2_2or2i")
+region = Rect2(384, 0, 64, 64)
+
+[sub_resource type="SpriteFrames" id="SpriteFrames_vs2h8"]
+animations = [{
+"frames": [{
+"duration": 1.0,
+"texture": SubResource("AtlasTexture_d2wqn")
+}, {
+"duration": 1.0,
+"texture": SubResource("AtlasTexture_5if36")
+}, {
+"duration": 1.0,
+"texture": SubResource("AtlasTexture_susdi")
+}, {
+"duration": 1.0,
+"texture": SubResource("AtlasTexture_6uwmj")
+}, {
+"duration": 1.0,
+"texture": SubResource("AtlasTexture_pdkj8")
+}, {
+"duration": 1.0,
+"texture": SubResource("AtlasTexture_qs6ya")
+}],
+"loop": 1,
+"name": &"idle",
+"speed": 5.0
+}]
+
+[node name="base_enemy" type="CharacterBody2D" unique_id=991394093]
+script = ExtResource("1_cjhsq")
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="." unique_id=389840244]
+shape = SubResource("RectangleShape2D_1puhw")
+
+[node name="AnimatedSprite2D" type="AnimatedSprite2D" parent="." unique_id=1069897540]
+modulate = Color(1, 0, 0.4, 1)
+sprite_frames = SubResource("SpriteFrames_vs2h8")
+animation = &"idle"
+
+[node name="StateMachine" type="Node" parent="." unique_id=478916629]
+script = ExtResource("2_qfy1r")
