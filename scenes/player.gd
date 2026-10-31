@@ -13,6 +13,10 @@ const MAX_FALL_SPEED := 500.0        # предел скорости паден�
 const SPRITE_FACES_LEFT := false      # если игрок повернут направо спрайты зеркалят
 var dash_allows_jump := false   # можно ли прервать текущий рывок прыжком
 
+const PROJECTILE_SCENE := preload("res://scenes/projectile.tscn")
+const SHOOT_COOLDOWN := 0.35
+const MUZZLE_OFFSET := Vector2(14, -8)   # откуда вылетает снаряд относительно игрока (для взгляда вправо)
+
 # --- Отзывчивость прыжка ---
 const COYOTE_TIME := 0.1             # окно прыжка после схода с края, сек
 const JUMP_BUFFER_TIME := 0.12       # запоминание нажатия прыжка до приземления, сек
@@ -40,6 +44,7 @@ var dash_cooldown_left := 0.0
 var fall_time := 0.0
 var coyote_time_left := 0.0
 var jump_buffer_left := 0.0
+var shoot_cooldown_left := 0.0
 
 
 func _physics_process(delta: float) -> void:
@@ -68,6 +73,9 @@ func read_input() -> void:
 	if Input.is_action_just_pressed("dash") and can_dash():
 		start_dash()
 
+	if Input.is_action_just_pressed("shoot") and can_shoot():
+		shoot()
+	
 	# Запоминаем нажатие, чтобы прыжок сработал, даже если нажали чуть раньше приземления
 	if Input.is_action_just_pressed("jump"):
 		jump_buffer_left = JUMP_BUFFER_TIME
@@ -119,6 +127,9 @@ func can_jump() -> bool:
 func can_dash() -> bool:
 	return state == State.NORMAL and dashes_left > 0 and dash_cooldown_left <= 0.0
 
+func can_shoot() -> bool:
+	return state == State.NORMAL and shoot_cooldown_left <= 0.0
+
 
 # --- Движение ---
 
@@ -138,6 +149,19 @@ func apply_gravity(delta: float) -> void:
 
 	velocity.y += gravity * delta
 	velocity.y = minf(velocity.y, MAX_FALL_SPEED)
+
+
+# --- Атака ---
+func shoot() -> void:
+	shoot_cooldown_left = SHOOT_COOLDOWN
+
+	var Projectile := PROJECTILE_SCENE.instantiate() as projectile
+	# Добавляем в сцену, а не к игроку, иначе снаряд будет двигаться вместе с ним
+	get_tree().current_scene.add_child(Projectile)
+
+	var spawn_pos := global_position + Vector2(MUZZLE_OFFSET.x * facing, MUZZLE_OFFSET.y)
+	Projectile.launch(spawn_pos, Vector2(facing, 0.0), self)
+
 
 
 # --- Прыжок ---
@@ -185,6 +209,7 @@ func update_timers(delta: float) -> void:
 	dash_cooldown_left = maxf(dash_cooldown_left - delta, 0.0)
 	coyote_time_left = maxf(coyote_time_left - delta, 0.0)
 	jump_buffer_left = maxf(jump_buffer_left - delta, 0.0)
+	shoot_cooldown_left = maxf(shoot_cooldown_left - delta, 0.0)
 
 	if state == State.DASH:
 		dash_time_left -= delta
