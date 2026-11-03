@@ -1,8 +1,8 @@
 [gd_scene format=3 uid="uid://cfq8y8hbuprai"]
 
-[ext_resource type="Script" uid="uid://dmlcdo3osbkw7" path="res://scenes/base_enemy.gd" id="1_cjhsq"]
+[ext_resource type="Script" uid="uid://dmlcdo3osbkw7" path="res://scenes/enemies/base_enemy.gd" id="1_cjhsq"]
 [ext_resource type="Texture2D" uid="uid://38n2l3iyclvo" path="res://graphics/characters/tempAnim.png" id="2_2or2i"]
-[ext_resource type="Script" uid="uid://dls5ftrgp87b1" path="res://scenes/state.gd" id="2_qfy1r"]
+[ext_resource type="Script" uid="uid://b6wrwbrmeecoa" path="res://scenes/enemies/state_machine.gd" id="3_lkvl6"]
 
 [sub_resource type="RectangleShape2D" id="RectangleShape2D_1puhw"]
 size = Vector2(20, 36)
@@ -65,7 +65,6 @@ animations = [{
 }]
 
 [node name="base_enemy" type="CharacterBody2D" unique_id=991394093]
-position = Vector2(160, 505)
 script = ExtResource("1_cjhsq")
 
 [node name="CollisionShape2D" type="CollisionShape2D" parent="." unique_id=389840244]
@@ -76,4 +75,10 @@ modulate = Color(1, 0, 0.4, 1)
 sprite_frames = SubResource("SpriteFrames_w7c3h")
 
 [node name="StateMachine" type="Node" parent="." unique_id=478916629]
-script = ExtResource("2_qfy1r")
+script = ExtResource("3_lkvl6")
+
+[node name="Idle" type="Node" parent="StateMachine" unique_id=237535134]
+
+[node name="Patrol" type="Node" parent="StateMachine" unique_id=585123139]
+
+[node name="Chase" type="Node" parent="StateMachine" unique_id=1516496167]

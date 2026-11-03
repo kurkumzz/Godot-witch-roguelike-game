@@ -2,7 +2,7 @@
 
 [ext_resource type="PackedScene" uid="uid://geegx138cdxf" path="res://scenes/player.tscn" id="1_2q6dc"]
 [ext_resource type="Texture2D" uid="uid://dsxisympdupu0" path="res://graphics/cavetile.png" id="1_w7c3h"]
-[ext_resource type="PackedScene" uid="uid://cfq8y8hbuprai" path="res://scenes/base_enemy.tscn" id="3_w8frs"]
+[ext_resource type="PackedScene" uid="uid://cfq8y8hbuprai" path="res://scenes/enemies/base_enemy.tscn" id="3_w8frs"]
 
 [sub_resource type="TileSetAtlasSource" id="TileSetAtlasSource_w8frs"]
 texture = ExtResource("1_w7c3h")

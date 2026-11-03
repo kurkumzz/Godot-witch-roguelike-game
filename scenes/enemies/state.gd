@@ -1,7 +1,7 @@
 class_name State
 extends Node
 
-var enemy
+var enemy: BaseEnemy
 
 func enter():
 	pass
@@ -10,4 +10,4 @@ func exit():
 	pass
 
 func update(delta):
-	pass
+	return null

@@ -16,6 +16,7 @@ var isDead := false
 
 func _ready() -> void:
 	health = maxHealth
+	states.init()
 	
 func _physics_process(delta: float) -> void:
 	# Add the gravity.
