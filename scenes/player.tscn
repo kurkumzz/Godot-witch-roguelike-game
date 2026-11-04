@@ -2,6 +2,7 @@
 
 [ext_resource type="Script" uid="uid://cn1v1gy5libro" path="res://scenes/player.gd" id="1_3vyb7"]
 [ext_resource type="Texture2D" uid="uid://38n2l3iyclvo" path="res://graphics/characters/tempAnim.png" id="2_g2els"]
+[ext_resource type="Script" uid="uid://txkivfrn5w1v" path="res://scenes/health_bar.gd" id="3_qhqgy"]
 
 [sub_resource type="RectangleShape2D" id="RectangleShape2D_2ktqi"]
 size = Vector2(14, 32)
@@ -169,6 +170,12 @@ animations = [{
 "speed": 15.0
 }]
 
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_qhqgy"]
+bg_color = Color(0.34778348, 0.017555572, 0, 1)
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_dqkch"]
+bg_color = Color(0.81781465, 0.08395664, 0, 1)
+
 [node name="player" type="CharacterBody2D" unique_id=1179664223 groups=["player"]]
 script = ExtResource("1_3vyb7")
 
@@ -183,3 +190,17 @@ position_smoothing_speed = 15.0
 [node name="AnimatedSprite2D" type="AnimatedSprite2D" parent="." unique_id=463181992]
 sprite_frames = SubResource("SpriteFrames_2ktqi")
 animation = &"left"
+
+[node name="healthBar" type="ProgressBar" parent="." unique_id=26704549]
+custom_minimum_size = Vector2(24, 4)
+custom_maximum_size = Vector2(24, 4)
+offset_left = -12.0
+offset_top = -20.0
+offset_right = 12.0
+offset_bottom = -16.0
+theme_override_styles/background = SubResource("StyleBoxFlat_qhqgy")
+theme_override_styles/fill = SubResource("StyleBoxFlat_dqkch")
+step = 1.0
+value = 24.0
+show_percentage = false
+script = ExtResource("3_qhqgy")

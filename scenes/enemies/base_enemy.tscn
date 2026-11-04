@@ -5,6 +5,7 @@
 [ext_resource type="Script" uid="uid://b6wrwbrmeecoa" path="res://scenes/enemies/state_machine.gd" id="3_lkvl6"]
 [ext_resource type="Script" uid="uid://b27a2o705mcpa" path="res://scenes/enemies/patrol.gd" id="4_n763p"]
 [ext_resource type="Script" uid="uid://bitr0nhp7brk" path="res://scenes/enemies/idle.gd" id="4_ylyo2"]
+[ext_resource type="Script" path="res://scenes/enemies/status.gd" id="6_2t7ph"]
 
 [sub_resource type="RectangleShape2D" id="RectangleShape2D_1puhw"]
 size = Vector2(20, 36)
@@ -119,3 +120,6 @@ script = ExtResource("4_ylyo2")
 
 [node name="Patrol" type="Node" parent="StateMachine" unique_id=585123139]
 script = ExtResource("4_n763p")
+
+[node name="statusComp" type="Node" parent="." unique_id=1786849318]
+script = ExtResource("6_2t7ph")

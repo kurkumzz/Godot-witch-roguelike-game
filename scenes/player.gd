@@ -1,6 +1,9 @@
 extends CharacterBody2D
 
-enum State { NORMAL, DASH }
+signal health_changed(current: int, maximum: int)
+signal died
+
+enum State { NORMAL, DASH, DEAD }
 @onready var sprite: AnimatedSprite2D = $AnimatedSprite2D
 # --- Константы движения ---
 const SPEED := 200.0
@@ -12,11 +15,14 @@ const FALL_GRAVITY_DELAY := 0.15     # сколько секунд падени�
 const MAX_FALL_SPEED := 500.0        # предел скорости падения, пикс/сек
 const SPRITE_FACES_LEFT := false      # если игрок повернут направо спрайты зеркалят
 var dash_allows_jump := false   # можно ли прервать текущий рывок прыжком
+var max_health := 30
+var health := 0
+
 
 const PROJECTILE_SCENE := preload("res://scenes/projectile.tscn")
-const SHOOT_COOLDOWN := 0.35
+const SHOOT_COOLDOWN := 0.20
 const MUZZLE_OFFSET := Vector2(14, -8)   # откуда вылетает снаряд относительно игрока (для взгляда вправо)
-
+var current_element: Element.Type = Element.Type.WATER
 # --- Отзывчивость прыжка ---
 const COYOTE_TIME := 0.1             # окно прыжка после схода с края, сек
 const JUMP_BUFFER_TIME := 0.12       # запоминание нажатия прыжка до приземления, сек
@@ -46,6 +52,11 @@ var coyote_time_left := 0.0
 var jump_buffer_left := 0.0
 var shoot_cooldown_left := 0.0
 
+@onready var health_bar: ProgressBar = $healthBar
+func _ready() -> void:
+	health = max_health
+	health_changed.connect(health_bar.update_bar)
+	health_changed.emit(health, max_health)   # первая отрисовка полной полоски
 
 func _physics_process(delta: float) -> void:
 	update_timers(delta)
@@ -58,9 +69,19 @@ func _physics_process(delta: float) -> void:
 			apply_gravity(delta)
 		State.DASH:
 			apply_dash()
+		State.DEAD:
+			apply_gravity(delta)
 
 	move_and_slide()
 	update_animation()
+
+#ПРОВЕРКА ХП "К" дамажит "J" хилит
+func _unhandled_input(event: InputEvent) -> void:
+	if event is InputEventKey and event.pressed:
+		if event.keycode == KEY_K:
+			take_damage(1)
+		elif event.keycode == KEY_J:
+			heal(1)
 
 
 # --- Ввод ---
@@ -88,6 +109,30 @@ func read_input() -> void:
 
 	if Input.is_action_just_released("jump"):
 		cut_jump()
+
+
+# --- Здоровье ---
+
+func take_damage(amount: int) -> void:
+	if state == State.DEAD:
+		return
+	health = maxi(health - amount, 0)
+	health_changed.emit(health, max_health)
+	if health == 0:
+		die()
+
+
+func heal(amount: int) -> void:
+	if state == State.DEAD:
+		return
+	health = mini(health + amount, max_health)
+	health_changed.emit(health, max_health)
+
+
+func die() -> void:
+	state = State.DEAD
+	velocity.x = 0.0
+	died.emit()
 
 
 # --- Анимации ---
@@ -160,7 +205,7 @@ func shoot() -> void:
 	get_tree().current_scene.add_child(Projectile)
 
 	var spawn_pos := global_position + Vector2(MUZZLE_OFFSET.x * facing, MUZZLE_OFFSET.y)
-	Projectile.launch(spawn_pos, Vector2(facing, 0.0), self)
+	Projectile.launch(spawn_pos, Vector2(facing, 0.0), self, current_element)
 
 
 

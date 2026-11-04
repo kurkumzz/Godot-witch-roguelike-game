@@ -83,10 +83,10 @@ tile_set = SubResource("TileSet_2ktqi")
 [node name="entities" type="Node2D" parent="." unique_id=667794752]
 
 [node name="player" parent="entities" unique_id=1179664223 instance=ExtResource("1_2q6dc")]
-position = Vector2(414, 552)
+position = Vector2(413, 559)
 
 [node name="base_enemy" parent="entities" unique_id=991394093 instance=ExtResource("3_w8frs")]
-position = Vector2(95, 555)
+position = Vector2(95, 558)
 speedMovement = 50.0
 
 [node name="StateMachine" parent="entities/base_enemy" index="2" unique_id=478916629 node_paths=PackedStringArray("initialState")]
@@ -95,6 +95,10 @@ initialState = NodePath("Idle")
 [node name="Patrol" parent="entities/base_enemy/StateMachine" index="1" unique_id=585123139 node_paths=PackedStringArray("pointA", "pointB")]
 pointA = NodePath("../../../../A")
 pointB = NodePath("../../../../B")
+
+[node name="statusComp" parent="entities/base_enemy" index="3" unique_id=1786849318]
+show_debug_label = null
+label_offset = null
 
 [node name="A" type="Marker2D" parent="." unique_id=229138117]
 position = Vector2(11, 563)
