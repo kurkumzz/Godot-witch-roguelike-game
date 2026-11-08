@@ -9,8 +9,7 @@ func update(delta):
 	if(enemy.distanceBetween() > enemy.loseRange):
 		return "Idle"
 	
-	var dx = target - enemy.global_position.x
-	var dir = sign(dx)
-	enemy.velocity.x = enemy.speedMovement * dir
-	enemy.anim.flip_h = dir < 0
+	var dx = enemy.currentDir(target)
+	enemy.velocity.x = enemy.speedMovement * dx
+	enemy.flipSprite(dx)
 	

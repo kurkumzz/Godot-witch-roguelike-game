@@ -16,4 +16,6 @@ func init():
 	for child in get_children():
 		child.enemy = get_parent()
 	currentState = initialState
+	if(currentState == null):
+		push_error(get_parent().name + ": в currentState не назначено состояние")
 	currentState.enter()

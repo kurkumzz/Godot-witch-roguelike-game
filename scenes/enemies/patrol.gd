@@ -21,6 +21,7 @@ func update(delta):
 	if enemy.distanceBetween() < enemy.detectRange:
 		return "Chase"
 
+	var dir = enemy.currentDir(target.global_position.x)
 	var dx = target.global_position.x - enemy.global_position.x
 	if abs(dx) < 5:
 		if target == pointA:
@@ -30,7 +31,6 @@ func update(delta):
 		enemy.velocity.x = 0
 		return "Idle"
 
-	var dir = sign(dx)
 	enemy.velocity.x = dir * enemy.speedMovement
-	enemy.anim.flip_h = dir < 0
+	enemy.flipSprite(dir)
 	return null

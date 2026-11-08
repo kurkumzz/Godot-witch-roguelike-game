@@ -54,3 +54,10 @@ func distanceBetween() -> float:
 	if not is_instance_valid(player): return INF
 	return global_position.distance_to(player.global_position)
 	
+func currentDir(target: float) -> float:
+	var dx = target - global_position.x
+	var dir = sign(dx)
+	return dir
+
+func flipSprite(dir: float):
+	anim.flip_h = dir < 0
