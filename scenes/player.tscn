@@ -177,6 +177,7 @@ bg_color = Color(0.34778348, 0.017555572, 0, 1)
 bg_color = Color(0.81781465, 0.08395664, 0, 1)
 
 [node name="player" type="CharacterBody2D" unique_id=1179664223 groups=["player"]]
+collision_layer = 2
 script = ExtResource("1_3vyb7")
 
 [node name="CollisionShape2D" type="CollisionShape2D" parent="." unique_id=1460352614]

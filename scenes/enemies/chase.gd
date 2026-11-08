@@ -2,14 +2,18 @@ extends State
 
 func enter():
 	enemy.anim.play("patrol")
-	
+
 func update(delta):
-	var target = enemy.player.global_position.x
-	
-	if(enemy.distanceBetween() > enemy.loseRange):
+	var distance = enemy.distanceBetween()
+
+	if distance > enemy.loseRange:
 		return "Idle"
-	
-	var dx = enemy.currentDir(target)
-	enemy.velocity.x = enemy.speedMovement * dx
-	enemy.flipSprite(dx)
-	
+
+	if distance < enemy.attackRange:
+		return "Attack"
+
+	var target = enemy.player.global_position.x
+	var dir = enemy.currentDir(target)
+	enemy.velocity.x = enemy.speedMovement * dir
+	enemy.flipSprite(dir)
+	return null

@@ -3,6 +3,7 @@
 [ext_resource type="PackedScene" uid="uid://geegx138cdxf" path="res://scenes/player.tscn" id="1_2q6dc"]
 [ext_resource type="Texture2D" uid="uid://dsxisympdupu0" path="res://graphics/cavetile.png" id="1_w7c3h"]
 [ext_resource type="PackedScene" uid="uid://cfq8y8hbuprai" path="res://scenes/enemies/base_enemy.tscn" id="3_w8frs"]
+[ext_resource type="Script" uid="uid://cnd2v84pn8qs4" path="res://scenes/enemies/attack.gd" id="4_mx8sn"]
 
 [sub_resource type="TileSetAtlasSource" id="TileSetAtlasSource_w8frs"]
 texture = ExtResource("1_w7c3h")
@@ -72,6 +73,7 @@ texture = ExtResource("1_w7c3h")
 
 [sub_resource type="TileSet" id="TileSet_2ktqi"]
 physics_layer_0/collision_layer = 1
+physics_layer_0/collision_mask = 0
 sources/0 = SubResource("TileSetAtlasSource_w8frs")
 
 [node name="level" type="Node2D" unique_id=612394683]
@@ -89,12 +91,18 @@ position = Vector2(413, 559)
 position = Vector2(95, 558)
 speedMovement = 50.0
 
-[node name="StateMachine" parent="entities/base_enemy" index="2" unique_id=478916629 node_paths=PackedStringArray("initialState")]
+[node name="AnimatedSprite2D" parent="entities/base_enemy" index="1" unique_id=1069897540]
+frame_progress = 0.0
+
+[node name="StateMachine" parent="entities/base_enemy" index="3" unique_id=478916629 node_paths=PackedStringArray("initialState")]
 initialState = NodePath("Idle")
 
 [node name="Patrol" parent="entities/base_enemy/StateMachine" index="1" unique_id=585123139 node_paths=PackedStringArray("pointA", "pointB")]
 pointA = NodePath("../../../../A")
 pointB = NodePath("../../../../B")
+
+[node name="Attack" parent="entities/base_enemy/StateMachine" index="3" unique_id=2114329141]
+script = ExtResource("4_mx8sn")
 
 [node name="A" type="Marker2D" parent="." unique_id=229138117]
 position = Vector2(11, 563)

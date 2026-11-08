@@ -1,6 +1,5 @@
 extends State
 
-#счетчик
 var timer: float
 @export var idleTimeCount: float = 3.0
 

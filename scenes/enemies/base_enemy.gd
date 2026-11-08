@@ -3,21 +3,27 @@ extends CharacterBody2D
 
 signal died
 
-var player
-
+#движение
 @export var speedMovement = 300.0
 
-@export var maxHealth: int = 100
+#здоровье и урон
+@export var maxHealth: int = 10
+var health: int
 @export var damage: int = 1
 
-var health: int
+#статус
 var isDead := false
+var isHitted := false
 
+#расстояния
 @export var detectRange: float = 200.0
 @export var loseRange: float = 300.0
+@export var attackRange: float = 60.0
 
+#гет компоненты
 @onready var anim := $AnimatedSprite2D
 @onready var states := $StateMachine
+var player
 
 func _ready() -> void:
 	health = maxHealth
@@ -61,3 +67,7 @@ func currentDir(target: float) -> float:
 
 func flipSprite(dir: float):
 	anim.flip_h = dir < 0
+
+func _on_hitbox_body_entered(body: Node2D) -> void:
+	if body.is_in_group("player") and body.has_method("take_damage"):
+		body.take_damage(damage)

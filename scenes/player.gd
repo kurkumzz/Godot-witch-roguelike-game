@@ -16,7 +16,7 @@ const FALL_GRAVITY_DELAY := 0.15     # сколько секунд падени�
 const MAX_FALL_SPEED := 500.0        # предел скорости падения, пикс/сек
 const SPRITE_FACES_LEFT := false      # если игрок повернут направо спрайты зеркалят
 var dash_allows_jump := false   # можно ли прервать текущий рывок прыжком
-var max_health := 30
+var max_health := 10
 var health := 0
 
 
