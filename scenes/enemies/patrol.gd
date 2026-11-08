@@ -4,8 +4,6 @@ extends State
 @export var pointB: Marker2D
 
 var target: Marker2D
-#дублирование кода потом на оптимизацию в baseEnemy закинуть
-@export var detectRange: float = 200.0
 
 func enter():
 	if pointA == null or pointB == null:
@@ -20,8 +18,8 @@ func update(delta):
 		enemy.velocity.x = 0
 		return null
 
-	#if enemy.distance() < detectRange:
-		#return "Chase"
+	if enemy.distanceBetween() < enemy.detectRange:
+		return "Chase"
 
 	var dx = target.global_position.x - enemy.global_position.x
 	if abs(dx) < 5:

@@ -13,6 +13,8 @@ var player
 var health: int
 var isDead := false
 
+@export var detectRange: float = 200.0
+@export var loseRange: float = 300.0
 
 @onready var anim := $AnimatedSprite2D
 @onready var states := $StateMachine
@@ -48,7 +50,7 @@ func die():
 	died.emit()
 	queue_free()
 
-func distance() -> float:
+func distanceBetween() -> float:
 	if not is_instance_valid(player): return INF
 	return global_position.distance_to(player.global_position)
 	
