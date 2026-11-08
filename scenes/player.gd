@@ -25,7 +25,7 @@ const SHOOT_COOLDOWN := 0.20
 const MUZZLE_OFFSET := Vector2(14, -8)   # откуда вылетает снаряд относительно игрока (для взгляда вправо)
 
 # --- Палочка ---
-var wand: Array[Element.Type] = [Element.Type.WATER, Element.Type.FIRE]   # 2 слота
+var wand: Array[Element.Type] = [Element.Type.WATER, Element.Type.FIRE, Element.Type.ICE]
 var wand_index := 0
 var current_element: Element.Type = Element.Type.WATER
 @export var show_element_debug := true
