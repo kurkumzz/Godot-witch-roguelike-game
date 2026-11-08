@@ -2,6 +2,7 @@ extends CharacterBody2D
 
 signal health_changed(current: int, maximum: int)
 signal died
+signal element_changed(element: Element.Type)
 
 enum State { NORMAL, DASH, DEAD }
 @onready var sprite: AnimatedSprite2D = $AnimatedSprite2D
@@ -22,7 +23,15 @@ var health := 0
 const PROJECTILE_SCENE := preload("res://scenes/projectile.tscn")
 const SHOOT_COOLDOWN := 0.20
 const MUZZLE_OFFSET := Vector2(14, -8)   # откуда вылетает снаряд относительно игрока (для взгляда вправо)
+
+# --- Палочка ---
+var wand: Array[Element.Type] = [Element.Type.WATER, Element.Type.FIRE]   # 2 слота
+var wand_index := 0
 var current_element: Element.Type = Element.Type.WATER
+@export var show_element_debug := true
+var element_label: Label
+
+
 # --- Отзывчивость прыжка ---
 const COYOTE_TIME := 0.1             # окно прыжка после схода с края, сек
 const JUMP_BUFFER_TIME := 0.12       # запоминание нажатия прыжка до приземления, сек
@@ -57,6 +66,9 @@ func _ready() -> void:
 	health = max_health
 	health_changed.connect(health_bar.update_bar)
 	health_changed.emit(health, max_health)   # первая отрисовка полной полоски
+	current_element = wand[wand_index]
+	if show_element_debug:
+		create_element_label()
 
 func _physics_process(delta: float) -> void:
 	update_timers(delta)
@@ -96,6 +108,8 @@ func read_input() -> void:
 
 	if Input.is_action_just_pressed("shoot") and can_shoot():
 		shoot()
+	if Input.is_action_just_pressed("change") and state != State.DEAD:
+		switch_element()
 	
 	# Запоминаем нажатие, чтобы прыжок сработал, даже если нажали чуть раньше приземления
 	if Input.is_action_just_pressed("jump"):
@@ -208,6 +222,38 @@ func shoot() -> void:
 	Projectile.launch(spawn_pos, Vector2(facing, 0.0), self, current_element)
 
 
+
+# --- Палочка ---
+
+func switch_element() -> void:
+	wand_index = (wand_index + 1) % wand.size()
+	current_element = wand[wand_index]
+	element_changed.emit(current_element)
+
+
+# --- Отладочная надпись стихии ---
+
+func create_element_label() -> void:
+	# CanvasLayer, чтобы надпись была привязана к экрану, а не ездила за игроком
+	var layer := CanvasLayer.new()
+	add_child(layer)
+
+	element_label = Label.new()
+	layer.add_child(element_label)
+	element_label.set_anchors_and_offsets_preset(Control.PRESET_BOTTOM_RIGHT, Control.PRESET_MODE_MINSIZE, 8)
+	element_label.grow_horizontal = Control.GROW_DIRECTION_BEGIN
+	element_label.grow_vertical = Control.GROW_DIRECTION_BEGIN
+	element_label.add_theme_font_size_override("font_size", 10)
+	element_label.add_theme_color_override("font_outline_color", Color.BLACK)
+	element_label.add_theme_constant_override("outline_size", 3)
+
+	element_changed.connect(update_element_label)
+	update_element_label(current_element)
+
+
+func update_element_label(element: Element.Type) -> void:
+	element_label.text = "ELEMENT: %s" % Element.Type.keys()[element]
+	element_label.add_theme_color_override("font_color", Element.COLORS[element])
 
 # --- Прыжок ---
 

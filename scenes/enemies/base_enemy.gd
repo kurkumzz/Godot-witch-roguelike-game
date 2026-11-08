@@ -7,7 +7,7 @@ var player
 
 @export var speedMovement = 300.0
 
-@export var maxHealth: int = 5
+@export var maxHealth: int = 100
 @export var damage: int = 1
 
 var health: int
