@@ -96,10 +96,6 @@ initialState = NodePath("Idle")
 pointA = NodePath("../../../../A")
 pointB = NodePath("../../../../B")
 
-[node name="statusComp" parent="entities/base_enemy" index="3" unique_id=1786849318]
-show_debug_label = null
-label_offset = null
-
 [node name="A" type="Marker2D" parent="." unique_id=229138117]
 position = Vector2(11, 563)
 
