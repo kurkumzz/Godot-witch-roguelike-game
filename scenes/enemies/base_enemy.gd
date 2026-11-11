@@ -24,6 +24,7 @@ var isHitted := false
 @onready var anim := $AnimatedSprite2D
 @onready var states := $StateMachine
 var player
+@onready var hitbox: Area2D = $Hitbox #нужно для лучшей проверки хитбоксов для получения урона
 
 func _ready() -> void:
 	health = maxHealth
@@ -34,14 +35,9 @@ func _physics_process(delta: float) -> void:
 	# Add the gravity.
 	if not is_on_floor():
 		velocity += get_gravity() * delta
-	
-	#проверка урона. testTakeDamageButton временная кнопка!!
-	if Input.is_action_just_pressed("testTakeDamageButton"):
-		takeDamage(1)
-		print("auch!")
-		
 	states.update(delta)
 	move_and_slide()
+	damage_overlapping_player()
 
 func takeDamage(amount: int):
 	if(isDead):
@@ -68,6 +64,7 @@ func currentDir(target: float) -> float:
 func flipSprite(dir: float):
 	anim.flip_h = dir < 0
 
-func _on_hitbox_body_entered(body: Node2D) -> void:
-	if body.is_in_group("player") and body.has_method("take_damage"):
-		body.take_damage(damage)
+func damage_overlapping_player() -> void:
+	for body in hitbox.get_overlapping_bodies():
+		if body.is_in_group("player") and body.has_method("take_damage"):
+			body.take_damage(damage, global_position)

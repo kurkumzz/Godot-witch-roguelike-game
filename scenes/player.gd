@@ -4,7 +4,7 @@ signal health_changed(current: int, maximum: int)
 signal died
 signal element_changed(element: Element.Type)
 
-enum State { NORMAL, DASH, DEAD }
+enum State { NORMAL, DASH, DEAD, HURT}
 @onready var sprite: AnimatedSprite2D = $AnimatedSprite2D
 # --- Константы движения ---
 const SPEED := 200.0
@@ -45,6 +45,20 @@ const DASH_COOLDOWN := 0.3
 var max_jumps := 1
 var max_dashes := 1
 
+
+# --- Получение урона ---
+const HIT_FLASH_SHADER := preload("res://scenes/shaders/hit.gdshader")
+const KNOCKBACK_SPEED := Vector2(200.0, 100.0)  # x: толчок от врага, y: небольшой подброс
+const HURT_DURATION := 0.25        # сколько секунд игрок не управляется (откат ≈ 300 × 0.25 = 75 пикс)
+const INVULNERABILITY_TIME := 1.5  # неуязвимость, считается от момента удара
+const BLINK_INTERVAL := 0.1        # как часто спрайт мигает
+const HIT_FLASH_TIME := 0.2        # за сколько белый возвращается к обычному
+
+var hurt_time_left := 0.0
+var invulnerable_left := 0.0
+var flash_material: ShaderMaterial
+var flash_tween: Tween
+
 # --- Состояние ---
 var state := State.NORMAL
 var direction_x := 0.0
@@ -61,14 +75,13 @@ var coyote_time_left := 0.0
 var jump_buffer_left := 0.0
 var shoot_cooldown_left := 0.0
 
-@onready var health_bar: ProgressBar = $healthBar
 func _ready() -> void:
 	health = max_health
-	health_changed.connect(health_bar.update_bar)
 	health_changed.emit(health, max_health)   # первая отрисовка полной полоски
 	current_element = wand[wand_index]
 	if show_element_debug:
 		create_element_label()
+	setup_hit_flash()
 
 func _physics_process(delta: float) -> void:
 	update_timers(delta)
@@ -82,6 +95,8 @@ func _physics_process(delta: float) -> void:
 		State.DASH:
 			apply_dash()
 		State.DEAD:
+			apply_gravity(delta)
+		State.HURT:
 			apply_gravity(delta)
 
 	move_and_slide()
@@ -127,13 +142,19 @@ func read_input() -> void:
 
 # --- Здоровье ---
 
-func take_damage(amount: int) -> void:
-	if state == State.DEAD:
+func take_damage(amount: int, source_position := Vector2.INF) -> void:
+	if state == State.DEAD or invulnerable_left > 0.0:
 		return
+
 	health = maxi(health - amount, 0)
 	health_changed.emit(health, max_health)
 	if health == 0:
 		die()
+		return
+
+	invulnerable_left = INVULNERABILITY_TIME
+	start_hurt(source_position)
+	play_hit_flash()
 
 
 func heal(amount: int) -> void:
@@ -146,7 +167,53 @@ func heal(amount: int) -> void:
 func die() -> void:
 	state = State.DEAD
 	velocity.x = 0.0
+	invulnerable_left = 0.0
+	sprite.visible = true   # на случай, если умерли в момент "невидимого" кадра мигания
 	died.emit()
+
+
+
+# --- Эффекты получения урона ---
+
+func start_hurt(source_position: Vector2) -> void:
+	# Откидываем от источника урона. Если позицию не передали, откидываем назад
+	var dir := -facing
+	if source_position.is_finite():
+		var diff := global_position.x - source_position.x
+		if diff != 0.0:
+			dir = signf(diff)
+
+	state = State.HURT
+	hurt_time_left = HURT_DURATION
+	velocity = Vector2(dir * KNOCKBACK_SPEED.x, -KNOCKBACK_SPEED.y)
+	is_jumping = false
+	fall_time = 0.0
+
+
+func setup_hit_flash() -> void:
+	flash_material = ShaderMaterial.new()
+	flash_material.shader = HIT_FLASH_SHADER
+	flash_material.set_shader_parameter("flash_amount", 0.0)
+	sprite.material = flash_material
+
+
+func play_hit_flash() -> void:
+	if flash_tween:
+		flash_tween.kill()
+	flash_material.set_shader_parameter("flash_amount", 1.0)
+	flash_tween = create_tween()
+	flash_tween.tween_property(flash_material, "shader_parameter/flash_amount", 0.0, HIT_FLASH_TIME)
+
+
+func update_invulnerability(delta: float) -> void:
+	if invulnerable_left <= 0.0:
+		return
+	invulnerable_left -= delta
+	if invulnerable_left <= 0.0:
+		sprite.visible = true
+	else:
+		# Чётные интервалы спрайт виден, нечётные скрыт
+		sprite.visible = int(invulnerable_left / BLINK_INTERVAL) % 2 == 0
 
 
 # --- Анимации ---
@@ -157,6 +224,8 @@ func update_animation() -> void:
 
 
 func get_animation_name() -> String:
+	if state == State.HURT:
+		return "jump" if not is_on_floor() else "idle"
 	if state == State.DASH:
 		return "dash"
 	if not is_on_floor():
@@ -306,6 +375,13 @@ func update_timers(delta: float) -> void:
 		dash_time_left -= delta
 		if dash_time_left <= 0.0:
 			end_dash()
+
+	if state == State.HURT:
+		hurt_time_left -= delta
+		if hurt_time_left <= 0.0:
+			state = State.NORMAL
+
+	update_invulnerability(delta)
 
 
 func update_ground_state() -> void:
