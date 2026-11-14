@@ -86,6 +86,7 @@ tile_set = SubResource("TileSet_2ktqi")
 
 [node name="player" parent="entities" unique_id=1179664223 instance=ExtResource("1_2q6dc")]
 position = Vector2(413, 559)
+show_element_debug = true
 
 [node name="base_enemy" parent="entities" unique_id=991394093 instance=ExtResource("3_w8frs")]
 position = Vector2(95, 558)

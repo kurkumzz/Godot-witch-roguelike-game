@@ -9,7 +9,7 @@
 [ext_resource type="Script" uid="uid://cucxkrtompmlp" path="res://scenes/enemies/chase.gd" id="6_n2ebm"]
 
 [sub_resource type="RectangleShape2D" id="RectangleShape2D_1puhw"]
-size = Vector2(27, 22)
+size = Vector2(27, 35)
 
 [sub_resource type="AtlasTexture" id="AtlasTexture_n2ebm"]
 atlas = ExtResource("2_n2ebm")
@@ -121,7 +121,7 @@ collision_layer = 4
 script = ExtResource("1_cjhsq")
 
 [node name="CollisionShape2D" type="CollisionShape2D" parent="." unique_id=389840244]
-position = Vector2(-3.5, 5)
+position = Vector2(-3.5, -1.5)
 shape = SubResource("RectangleShape2D_1puhw")
 
 [node name="AnimatedSprite2D" type="AnimatedSprite2D" parent="." unique_id=1069897540]

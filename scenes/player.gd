@@ -4,7 +4,7 @@ signal health_changed(current: int, maximum: int)
 signal died
 signal element_changed(element: Element.Type)
 
-enum State { NORMAL, DASH, DEAD, HURT}
+enum State { NORMAL, DASH, DEAD, HURT, ATTACK}
 @onready var sprite: AnimatedSprite2D = $AnimatedSprite2D
 # --- Константы движения ---
 const SPEED := 200.0
@@ -40,6 +40,10 @@ const JUMP_BUFFER_TIME := 0.12       # запоминание нажатия п�
 const DASH_SPEED := 350.0
 const DASH_DURATION := 0.20
 const DASH_COOLDOWN := 0.3
+
+# атака
+const ATTACK_DURATION := 0.20
+var attack_time_left := 0.0
 
 # --- Лимиты (переменные, чтобы стихии могли их менять) ---
 var max_jumps := 1
@@ -98,6 +102,9 @@ func _physics_process(delta: float) -> void:
 			apply_gravity(delta)
 		State.HURT:
 			apply_gravity(delta)
+		State.ATTACK:
+			apply_gravity(delta)
+			velocity.x = direction_x * SPEED * 0.5 
 
 	move_and_slide()
 	update_animation()
@@ -228,6 +235,8 @@ func get_animation_name() -> String:
 		return "jump" if not is_on_floor() else "idle"
 	if state == State.DASH:
 		return "dash"
+	if state == State.ATTACK:
+		return "attack"
 	if not is_on_floor():
 		return "jump"
 	if direction_x != 0.0:
@@ -249,7 +258,7 @@ func play_animation(anim_name: String) -> void:
 func can_jump() -> bool:
 	if jumps_left <= 0:
 		return false
-	return state == State.NORMAL or (state == State.DASH and dash_allows_jump)
+	return state == State.NORMAL or (state == State.DASH and dash_allows_jump) or state == State.ATTACK 
 
 
 func can_dash() -> bool:
@@ -281,6 +290,8 @@ func apply_gravity(delta: float) -> void:
 
 # --- Атака ---
 func shoot() -> void:
+	state = State.ATTACK
+	attack_time_left = ATTACK_DURATION
 	shoot_cooldown_left = SHOOT_COOLDOWN
 
 	var Projectile := PROJECTILE_SCENE.instantiate() as projectile
@@ -380,7 +391,12 @@ func update_timers(delta: float) -> void:
 		hurt_time_left -= delta
 		if hurt_time_left <= 0.0:
 			state = State.NORMAL
-
+	
+	if state == State.ATTACK:
+		attack_time_left -= delta
+		if attack_time_left <= 0.0:
+			state = State.NORMAL
+			
 	update_invulnerability(delta)
 
 
