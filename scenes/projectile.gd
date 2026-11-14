@@ -41,5 +41,6 @@ func hit_enemy(enemy: BaseEnemy) -> void:
 	var final_damage := damage
 	var status := enemy.get_node_or_null("statusComp") as statusComp
 	if status:
-		final_damage = status.process_hit(element, damage)
+		# direction нужен для отбрасывания при перегрузке
+		final_damage = status.process_hit(element, damage, direction)
 	enemy.takeDamage(final_damage)
