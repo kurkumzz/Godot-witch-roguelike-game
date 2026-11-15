@@ -10,7 +10,7 @@ func enter():
 
 func update(delta):
 	
-	if(enemy.distanceBetween() < enemy.detectRange):
+	if(enemy.distanceBetween() < enemy.detectRange && enemy.canSeePlayerCheck()):
 		return "Chase"
 	
 	timer += delta

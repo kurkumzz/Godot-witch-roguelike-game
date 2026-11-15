@@ -6,10 +6,11 @@ var phase: Phase
 var timer: float
 var dashDir: float
 
-@export var plusToSpeed: float = 2.0
-@export var windupTime: float = 0.5
-@export var dashTime: float = 0.25
+@export var plusToSpeed: float = 10.0
+@export var windupTime: float = 0.2
+@export var dashTime: float = 0.10
 @export var attackCoolDown: float = 0.5
+@export var dashDistance: float 
 
 func enter():
 	startWindup()

@@ -278,7 +278,6 @@ script = ExtResource("1_3vyb7")
 show_element_debug = null
 
 [node name="CollisionShape2D" type="CollisionShape2D" parent="." unique_id=1460352614]
-position = Vector2(1, 3.5)
 shape = SubResource("RectangleShape2D_2ktqi")
 
 [node name="Camera2D" type="Camera2D" parent="." unique_id=1295316873]

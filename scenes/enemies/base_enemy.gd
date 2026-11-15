@@ -4,7 +4,8 @@ extends CharacterBody2D
 signal died
 
 #движение
-@export var speedMovement = 300.0
+@export var speedMovement = 500.0
+var facingDir := 1.0
 
 #здоровье и урон
 @export var maxHealth: int = 50
@@ -13,7 +14,6 @@ var health: int
 
 #статус
 var isDead := false
-var isHitted := false
 
 #отбрасывание (перегрузка и другие эффекты). Перебивает скорость от состояний
 var knockback_velocity := 0.0
@@ -29,10 +29,14 @@ var flash_tween: Tween
 @export var detectRange: float = 200.0
 @export var loseRange: float = 300.0
 @export var attackRange: float = 60.0
+@export var sightHeight := 15.0
+@export var deadZone: float = 10.0
+
 
 #гет компоненты
 @onready var anim := $AnimatedSprite2D
 @onready var states := $StateMachine
+@onready var label := $Label
 var player
 @onready var hitbox: Area2D = $Hitbox #нужно для лучшей проверки хитбоксов для получения урона
 
@@ -55,7 +59,9 @@ func _physics_process(delta: float) -> void:
 		knockback_velocity = move_toward(knockback_velocity, 0.0, knockback_decay * delta)
 		if is_on_wall():
 			knockback_velocity = 0.0
-
+	
+	label.text = str(snapped(abs(player.global_position.y - global_position.y), 1))
+	
 	move_and_slide()
 	damage_overlapping_player()
 
@@ -108,8 +114,20 @@ func currentDir(target: float) -> float:
 
 func flipSprite(dir: float):
 	anim.flip_h = dir < 0
+	if(anim.flip_h):
+		facingDir = -1.0
+	else:
+		facingDir = 1.0
 
 func damage_overlapping_player() -> void:
 	for body in hitbox.get_overlapping_bodies():
 		if body.is_in_group("player") and body.has_method("take_damage"):
 			body.take_damage(damage, global_position)
+
+func isPlayerInHeight() -> bool:
+	var heightDifference = abs(player.global_position.y - global_position.y)
+	return heightDifference < sightHeight
+
+func canSeePlayerCheck() -> bool:
+	var playerDir = currentDir(player.global_position.x)
+	return playerDir == facingDir and isPlayerInHeight()

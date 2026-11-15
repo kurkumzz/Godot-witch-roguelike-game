@@ -18,7 +18,7 @@ func update(delta):
 		enemy.velocity.x = 0
 		return null
 
-	if enemy.distanceBetween() < enemy.detectRange:
+	if enemy.distanceBetween() < enemy.detectRange && enemy.canSeePlayerCheck():
 		return "Chase"
 
 	var dir = enemy.currentDir(target.global_position.x)
