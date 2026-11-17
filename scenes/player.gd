@@ -104,7 +104,7 @@ func _physics_process(delta: float) -> void:
 			apply_gravity(delta)
 		State.ATTACK:
 			apply_gravity(delta)
-			velocity.x = direction_x * SPEED * 0.5 
+			velocity.x = 0
 
 	move_and_slide()
 	update_animation()

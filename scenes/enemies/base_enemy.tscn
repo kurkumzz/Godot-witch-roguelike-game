@@ -159,9 +159,9 @@ shape = SubResource("RectangleShape2D_1puhw")
 
 [node name="AnimatedSprite2D" type="AnimatedSprite2D" parent="." unique_id=1069897540]
 sprite_frames = SubResource("SpriteFrames_w7c3h")
-animation = &"patrol"
-frame = 3
-frame_progress = 0.44994807
+animation = &"attack"
+frame = 4
+frame_progress = 1.0
 
 [node name="Hitbox" type="Area2D" parent="." unique_id=153176843]
 collision_layer = 0

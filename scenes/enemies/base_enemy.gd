@@ -4,7 +4,7 @@ extends CharacterBody2D
 signal died
 
 #движение
-@export var speedMovement = 500.0
+@export var speedMovement = 100.0
 var facingDir := 1.0
 
 #здоровье и урон
@@ -14,6 +14,7 @@ var health: int
 
 #статус
 var isDead := false
+var isHitted := false
 
 #отбрасывание (перегрузка и другие эффекты). Перебивает скорость от состояний
 var knockback_velocity := 0.0
@@ -28,9 +29,9 @@ var flash_tween: Tween
 #расстояния
 @export var detectRange: float = 200.0
 @export var loseRange: float = 300.0
-@export var attackRange: float = 60.0
 @export var sightHeight := 15.0
 @export var deadZone: float = 10.0
+@export var attackRange: float = 100.0
 
 
 #гет компоненты
@@ -60,7 +61,7 @@ func _physics_process(delta: float) -> void:
 		if is_on_wall():
 			knockback_velocity = 0.0
 	
-	label.text = str(snapped(abs(player.global_position.y - global_position.y), 1))
+	label.text = str(snapped(abs(player.global_position.x - global_position.x), 1))
 	
 	move_and_slide()
 	damage_overlapping_player()
