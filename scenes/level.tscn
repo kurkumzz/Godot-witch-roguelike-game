@@ -4,6 +4,7 @@
 [ext_resource type="Texture2D" uid="uid://dsxisympdupu0" path="res://graphics/cavetile.png" id="1_w7c3h"]
 [ext_resource type="PackedScene" uid="uid://cfq8y8hbuprai" path="res://scenes/enemies/base_enemy.tscn" id="3_w8frs"]
 [ext_resource type="Script" uid="uid://cnd2v84pn8qs4" path="res://scenes/enemies/attack.gd" id="4_mx8sn"]
+[ext_resource type="PackedScene" uid="uid://weerhbpq7a34" path="res://scenes/parallaxBack/swamp_paral.tscn" id="5_ppgk2"]
 
 [sub_resource type="TileSetAtlasSource" id="TileSetAtlasSource_w8frs"]
 texture = ExtResource("1_w7c3h")
@@ -111,5 +112,8 @@ position = Vector2(11, 563)
 
 [node name="B" type="Marker2D" parent="." unique_id=1143919124]
 position = Vector2(238, 566)
+
+[node name="SwampParal" parent="." unique_id=907621136 instance=ExtResource("5_ppgk2")]
+position = Vector2(638, 450)
 
 [editable path="entities/base_enemy"]

@@ -1,0 +1,59 @@
+[gd_scene format=3 uid="uid://weerhbpq7a34"]
+
+[ext_resource type="Texture2D" uid="uid://bvvlnyle1mwbm" path="res://graphics/parallaxBack/swamp/0-skyt.png" id="1_k4f50"]
+[ext_resource type="Texture2D" uid="uid://c4k0unc3dvmwu" path="res://graphics/parallaxBack/swamp/1-fart.png" id="2_x8rhj"]
+[ext_resource type="Texture2D" uid="uid://c8d68gynvg5gr" path="res://graphics/parallaxBack/swamp/2-mid.png" id="3_dxr2b"]
+[ext_resource type="Texture2D" uid="uid://cbl5srmafx62i" path="res://graphics/parallaxBack/swamp/3-near.png" id="4_6hgeu"]
+[ext_resource type="Texture2D" uid="uid://dqbsj0d37m4sx" path="res://graphics/parallaxBack/swamp/4-front.png" id="5_enpcn"]
+[ext_resource type="Texture2D" uid="uid://bhydwoq8odxyh" path="res://graphics/parallaxBack/swamp/fog.png" id="6_74iie"]
+
+[node name="SwampParal" type="Node2D" unique_id=907621136]
+position = Vector2(636, 180)
+
+[node name="sky" type="Parallax2D" parent="." unique_id=1186730169]
+z_index = -5
+scroll_scale = Vector2(0.05, 1)
+repeat_size = Vector2(1280, 0)
+
+[node name="Sprite2D" type="Sprite2D" parent="sky" unique_id=1197626651]
+texture = ExtResource("1_k4f50")
+
+[node name="far" type="Parallax2D" parent="." unique_id=713486850]
+z_index = -4
+scroll_scale = Vector2(0.2, 1)
+repeat_size = Vector2(1280, 0)
+
+[node name="Sprite2D" type="Sprite2D" parent="far" unique_id=1839752510]
+texture = ExtResource("2_x8rhj")
+
+[node name="mid" type="Parallax2D" parent="." unique_id=1821636811]
+z_index = -3
+scroll_scale = Vector2(0.5, 1)
+repeat_size = Vector2(1280, 0)
+
+[node name="Sprite2D" type="Sprite2D" parent="mid" unique_id=574255126]
+texture = ExtResource("3_dxr2b")
+
+[node name="near" type="Parallax2D" parent="." unique_id=449397375]
+z_index = -2
+scroll_scale = Vector2(0.8, 1)
+repeat_size = Vector2(1280, 0)
+
+[node name="Sprite2D" type="Sprite2D" parent="near" unique_id=86019070]
+texture = ExtResource("4_6hgeu")
+
+[node name="front" type="Parallax2D" parent="." unique_id=1823001076]
+visible = false
+z_index = 1
+scroll_scale = Vector2(1.3, 1)
+scroll_offset = Vector2(0, 4)
+repeat_size = Vector2(1280, 0)
+
+[node name="Sprite2D" type="Sprite2D" parent="front" unique_id=1898517969]
+texture = ExtResource("5_enpcn")
+
+[node name="fog" type="Parallax2D" parent="." unique_id=1682488708]
+repeat_size = Vector2(1280, 0)
+
+[node name="Sprite2D" type="Sprite2D" parent="fog" unique_id=1631218428]
+texture = ExtResource("6_74iie")
