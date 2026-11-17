@@ -281,8 +281,12 @@ show_element_debug = null
 shape = SubResource("RectangleShape2D_2ktqi")
 
 [node name="Camera2D" type="Camera2D" parent="." unique_id=1295316873]
+offset = Vector2(0, -40)
+process_callback = 0
 position_smoothing_enabled = true
-position_smoothing_speed = 15.0
+position_smoothing_speed = 6.0
+drag_vertical_enabled = true
+editor_draw_limits = true
 
 [node name="AnimatedSprite2D" type="AnimatedSprite2D" parent="." unique_id=463181992]
 sprite_frames = SubResource("SpriteFrames_2ktqi")
