@@ -1,21 +1,14 @@
 [gd_scene format=3 uid="uid://cg86st2bqyp7x"]
 
 [ext_resource type="Script" uid="uid://c4hpga6ie2wo0" path="res://scenes/projectile.gd" id="1_c8fcr"]
-[ext_resource type="Texture2D" uid="uid://8hqmo21k34l0" path="res://icon.svg" id="2_q3m7n"]
+[ext_resource type="Shader" path="res://scenes/shaders/water_drop.gdshader" id="2_spell"]
 
 [sub_resource type="RectangleShape2D" id="RectangleShape2D_q3m7n"]
 size = Vector2(6, 6)
 
-[sub_resource type="SpriteFrames" id="SpriteFrames_softn"]
-animations = [{
-"frames": [{
-"duration": 1.0,
-"texture": ExtResource("2_q3m7n")
-}],
-"loop": 1,
-"name": &"default",
-"speed": 5.0
-}]
+[sub_resource type="ShaderMaterial" id="SpellMaterial"]
+resource_local_to_scene = true
+shader = ExtResource("2_spell")
 
 [node name="projectile" type="Area2D" unique_id=1710513185]
 collision_mask = 4
@@ -24,7 +17,10 @@ script = ExtResource("1_c8fcr")
 [node name="CollisionShape2D" type="CollisionShape2D" parent="." unique_id=899632052]
 shape = SubResource("RectangleShape2D_q3m7n")
 
-[node name="AnimatedSprite2D" type="AnimatedSprite2D" parent="." unique_id=1733466039]
-position = Vector2(1.1920929e-07, 1.1920929e-07)
-scale = Vector2(0.046875, 0.046875007)
-sprite_frames = SubResource("SpriteFrames_softn")
+[node name="Spell" type="ColorRect" parent="."]
+material = SubResource("SpellMaterial")
+offset_left = -14.0
+offset_top = -6.0
+offset_right = 6.0
+offset_bottom = 6.0
+mouse_filter = 2

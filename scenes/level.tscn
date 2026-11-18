@@ -3,8 +3,8 @@
 [ext_resource type="PackedScene" uid="uid://geegx138cdxf" path="res://scenes/player.tscn" id="1_2q6dc"]
 [ext_resource type="Texture2D" uid="uid://dham7ch7ss2l8" path="res://graphics/tilesets/Floor Tiles2.png" id="1_2r41h"]
 [ext_resource type="PackedScene" uid="uid://cfq8y8hbuprai" path="res://scenes/enemies/base_enemy.tscn" id="3_w8frs"]
-[ext_resource type="Script" uid="uid://cnd2v84pn8qs4" path="res://scenes/enemies/attack.gd" id="4_mx8sn"]
 [ext_resource type="PackedScene" uid="uid://weerhbpq7a34" path="res://scenes/parallaxBack/swamp_paral.tscn" id="5_ppgk2"]
+[ext_resource type="Script" uid="uid://bmroq0cbt8p07" path="res://scenes/level.gd" id="script_level"]
 
 [sub_resource type="TileSetAtlasSource" id="TileSetAtlasSource_klq6b"]
 texture = ExtResource("1_2r41h")
@@ -304,7 +304,10 @@ physics_layer_0/collision_layer = 1
 physics_layer_0/collision_mask = 0
 sources/1 = SubResource("TileSetAtlasSource_klq6b")
 
+[sub_resource type="WorldBoundaryShape2D" id="FallBoundary"]
+
 [node name="level" type="Node2D" unique_id=612394683]
+script = ExtResource("script_level")
 
 [node name="TileMapLayer2" type="TileMapLayer" parent="." unique_id=1003157672]
 position = Vector2(-18, -456)
@@ -316,7 +319,6 @@ position = Vector2(-18, -507)
 
 [node name="player" parent="entities" unique_id=1179664223 instance=ExtResource("1_2q6dc")]
 position = Vector2(677, 548)
-show_element_debug = true
 
 [node name="Camera2D" parent="entities/player" index="1" unique_id=1295316873]
 offset = Vector2(0, 0)
@@ -326,19 +328,34 @@ limit_bottom = 180
 [node name="base_enemy" parent="entities" unique_id=991394093 instance=ExtResource("3_w8frs")]
 position = Vector2(95, 558)
 sightHeight = 60.0
+maxHealth = 5
 
 [node name="AnimatedSprite2D" parent="entities/base_enemy" index="2" unique_id=1069897540]
 frame_progress = 0.0
 
-[node name="StateMachine" parent="entities/base_enemy" index="4" unique_id=478916629 node_paths=PackedStringArray("initialState")]
-initialState = NodePath("Idle")
-
-[node name="Patrol" parent="entities/base_enemy/StateMachine" index="1" unique_id=585123139 node_paths=PackedStringArray("pointA", "pointB")]
+[node name="Patrol" parent="entities/base_enemy/StateMachine" parent_id_path=PackedInt32Array(991394093, 478916629) index="1" unique_id=585123139 node_paths=PackedStringArray("pointA", "pointB")]
 pointA = NodePath("../../../../A")
 pointB = NodePath("../../../../B")
 
-[node name="Attack" parent="entities/base_enemy/StateMachine" index="3" unique_id=2114329141]
-script = ExtResource("4_mx8sn")
+[node name="WestSlime" parent="entities" unique_id=1024036997 instance=ExtResource("3_w8frs")]
+position = Vector2(-460, 606)
+sightHeight = 60.0
+maxHealth = 6
+
+[node name="MarshSlime" parent="entities" unique_id=1307070722 instance=ExtResource("3_w8frs")]
+position = Vector2(960, 606)
+sightHeight = 60.0
+maxHealth = 5
+
+[node name="GroveSlime" parent="entities" unique_id=1515650209 instance=ExtResource("3_w8frs")]
+position = Vector2(1430, 606)
+sightHeight = 60.0
+maxHealth = 6
+
+[node name="BankSlime" parent="entities" unique_id=312960820 instance=ExtResource("3_w8frs")]
+position = Vector2(1880, 606)
+sightHeight = 60.0
+maxHealth = 7
 
 [node name="A" type="Marker2D" parent="." unique_id=229138117]
 position = Vector2(-7, 56)
@@ -348,6 +365,16 @@ position = Vector2(220, 59)
 
 [node name="SwampParal" parent="." unique_id=907621136 instance=ExtResource("5_ppgk2")]
 position = Vector2(0, 0)
+
+[node name="FallZone" type="Area2D" parent="." unique_id=1280479727]
+position = Vector2(0, 400)
+collision_layer = 0
+collision_mask = 2
+
+[node name="Boundary" type="CollisionShape2D" parent="FallZone" unique_id=1818397317]
+shape = SubResource("FallBoundary")
+
+[connection signal="body_entered" from="FallZone" to="." method="_on_fall_zone_entered"]
 
 [editable path="entities/player"]
 [editable path="entities/base_enemy"]

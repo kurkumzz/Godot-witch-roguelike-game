@@ -4,6 +4,11 @@ extends RefCounted
 
 enum Type { NONE, FIRE, WATER, ICE, EARTH, AIR, ELECTRIC }
 
+const DISPLAY_NAMES := {
+	Type.NONE: "Пусто", Type.WATER: "Вода", Type.FIRE: "Огонь",
+	Type.ICE: "Лёд", Type.ELECTRIC: "Электро",
+}
+
 # Цвет снаряда для каждой стихии
 const COLORS := {
 	Type.NONE: Color.WHITE,

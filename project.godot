@@ -15,9 +15,13 @@ general/accessibility_support=1
 [application]
 
 config/name="learning"
-run/main_scene="uid://cfhj0dxunb8tr"
+run/main_scene="res://scenes/coven.tscn"
 config/features=PackedStringArray("4.7", "Forward Plus")
 config/icon="res://icon.svg"
+
+[autoload]
+
+RunState="*res://scenes/run_state.gd"
 
 [display]
 

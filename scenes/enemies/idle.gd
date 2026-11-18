@@ -10,11 +10,10 @@ func enter():
 
 func update(delta):
 	
-	if(enemy.distanceBetween() < enemy.detectRange && enemy.canSeePlayerCheck()):
+	if enemy.detects_player():
 		return "Chase"
 	
 	timer += delta
-	if(timer >= idleTimeCount):
-		#код для Patrol
+	if timer >= idleTimeCount:
 		return "Patrol"
 		

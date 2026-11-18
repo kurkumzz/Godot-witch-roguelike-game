@@ -6,20 +6,15 @@ extends State
 var target: Marker2D
 
 func enter():
-	if pointA == null or pointB == null:
-		push_error(enemy.name + ": в Patrol не назначены pointA/pointB")
-		return
 	if target == null:
 		target = pointA
 	enemy.anim.play("patrol")
 
 func update(delta):
-	if pointA == null or pointB == null:
-		enemy.velocity.x = 0
-		return null
-
-	if enemy.distanceBetween() < enemy.detectRange && enemy.canSeePlayerCheck() || enemy.distanceBetween() < enemy.detectRange + 50 && enemy.isHitted && !enemy.canSeePlayerCheck():
+	if enemy.detects_player():
 		return "Chase"
+	if pointA == null or pointB == null:
+		return "Idle"
 
 	var dir = enemy.currentDir(target.global_position.x)
 	var dx = target.global_position.x - enemy.global_position.x

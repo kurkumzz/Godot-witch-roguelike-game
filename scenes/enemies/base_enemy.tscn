@@ -7,6 +7,7 @@
 [ext_resource type="Script" uid="uid://bitr0nhp7brk" path="res://scenes/enemies/idle.gd" id="4_ylyo2"]
 [ext_resource type="Script" uid="uid://cjwmqjft784fg" path="res://scenes/enemies/status.gd" id="6_2t7ph"]
 [ext_resource type="Script" uid="uid://cucxkrtompmlp" path="res://scenes/enemies/chase.gd" id="6_n2ebm"]
+[ext_resource type="Script" path="res://scenes/enemies/attack.gd" id="7_attack"]
 
 [sub_resource type="RectangleShape2D" id="RectangleShape2D_1puhw"]
 size = Vector2(27, 35)
@@ -170,8 +171,9 @@ collision_mask = 2
 [node name="CollisionShape2D" type="CollisionShape2D" parent="Hitbox" unique_id=805197824]
 shape = SubResource("RectangleShape2D_vs2h8")
 
-[node name="StateMachine" type="Node" parent="." unique_id=478916629]
+[node name="StateMachine" type="Node" parent="." unique_id=478916629 node_paths=PackedStringArray("initialState")]
 script = ExtResource("3_lkvl6")
+initialState = NodePath("Idle")
 
 [node name="Idle" type="Node" parent="StateMachine" unique_id=237535134]
 script = ExtResource("4_ylyo2")
@@ -183,8 +185,8 @@ script = ExtResource("4_n763p")
 script = ExtResource("6_n2ebm")
 
 [node name="Attack" type="Node" parent="StateMachine" unique_id=2114329141]
+script = ExtResource("7_attack")
 
 [node name="statusComp" type="Node" parent="." unique_id=1786849318]
 script = ExtResource("6_2t7ph")
 
-[connection signal="body_entered" from="Hitbox" to="." method="_on_hitbox_body_entered"]

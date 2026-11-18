@@ -54,12 +54,11 @@ const CHARGE_MULTIPLIER := 2.0
 
 const OVERLOAD_MULTIPLIER := 2.0
 const OVERLOAD_KNOCKBACK := Vector2(350.0, 200.0)   # x: сила толчка, y: подброс
-const OVERLOAD_KNOCKBACK_DECAY := 800.0             # дальность ≈ x² / (2 × decay) ≈ 190 пикс
+const OVERLOAD_KNOCKBACK_DECAY := 800.0
 
 const SHATTER_MULTIPLIER := 2.0
 
 # --- Цепь по льду ---
-const ENEMY_GROUP := "enemies"        # группа, в которую BaseEnemy добавляет себя сам
 const CHAIN_RADIUS := 160.0           # на каком расстоянии разряд ищет соседей
 const CHAIN_MAX_TARGETS := 2          # сколько врагов может задеть цепь
 const CHAIN_DAMAGE_FACTOR := 0.5      # доля урона удара, которая уходит соседям
@@ -259,7 +258,7 @@ func spread_chain(base_damage: int) -> void:
 		return
 
 	var targets: Array[statusComp] = []
-	for node in get_tree().get_nodes_in_group(ENEMY_GROUP):
+	for node in get_tree().get_nodes_in_group(BaseEnemy.ENEMY_GROUP):
 		var other := node as BaseEnemy
 		if other == null or other == enemy or other.isDead:
 			continue
@@ -430,7 +429,7 @@ func update_visuals() -> void:
 # --- Отладочная надпись ---
 
 func create_debug_label() -> void:
-	debug_label = Label.new()
+	debug_label = enemy.get_node("Label") as Label
 	debug_label.position = label_offset
 	debug_label.custom_minimum_size = Vector2(60, 0)
 	debug_label.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
@@ -438,7 +437,6 @@ func create_debug_label() -> void:
 	debug_label.add_theme_color_override("font_outline_color", Color.BLACK)
 	debug_label.add_theme_constant_override("outline_size", 3)
 	debug_label.visible = false
-	get_parent().add_child.call_deferred(debug_label)
 
 
 func update_debug_label() -> void:
