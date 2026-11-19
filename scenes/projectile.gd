@@ -26,7 +26,10 @@ func launch(from: Vector2, dir: Vector2, owner_node: Node, elem: Element.Type = 
 	var spell_material: ShaderMaterial = $Spell.material
 	spell_material.shader = ELEMENT_SHADERS.get(element, ELEMENT_SHADERS[Element.Type.WATER])
 	$Spell.modulate = Element.COLORS[element]
+	# Первый выброс должен использовать координаты палочки, включая смещение Trail.
+	$Trail.force_update_transform()
 	reset_physics_interpolation()
+	$Trail.configure(element, false)
 
 
 func _ready() -> void:

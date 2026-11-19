@@ -1,13 +1,14 @@
 extends CharacterBody2D
 
 signal health_changed(current: int, maximum: int)
+signal shield_changed(current: int)
 signal died
 signal element_changed(element: Element.Type)
 
 enum State { NORMAL, DASH, DEAD, HURT, ATTACK }
 
 const PROJECTILE_SCENE := preload("res://scenes/projectile.tscn")
-const HIT_FLASH_SHADER := preload("res://scenes/shaders/hit.gdshader")
+const HitMaterial := preload("res://scenes/effects/hit_material.gd")
 
 const BASE_HEALTH := 10
 const SPEED := 200.0
@@ -24,7 +25,7 @@ const SPRITE_FACES_LEFT := false
 const DASH_SPEED := 350.0
 const DASH_DURATION := 0.20
 const DASH_COOLDOWN := 0.3
-const SHOOT_COOLDOWN := 0.20
+const BASE_SHOTS_PER_SECOND := 3.0
 const ATTACK_DURATION := 0.20
 const MUZZLE_OFFSET := Vector2(14, -8)
 
@@ -43,6 +44,7 @@ var current_element: Element.Type:
 
 var max_health := BASE_HEALTH
 var health := 0
+var shield := 0
 var state := State.NORMAL
 var state_time_left := 0.0
 var direction_x := 0.0
@@ -61,26 +63,43 @@ var dash_allows_jump := false
 var dash_cooldown_left := 0.0
 var shoot_cooldown_left := 0.0
 var invulnerable_left := 0.0
-var flash_material: ShaderMaterial
-var flash_tween: Tween
+var flash_material := HitMaterial.new()
 
 
 func _ready() -> void:
-	max_health = BASE_HEALTH + RunState.health_bonus
+	max_health = roundi(BASE_HEALTH * _stat_multiplier(&"health"))
 	health = max_health
-	health_changed.emit(health, max_health)
 	RunState.changed.connect(_apply_book_upgrades)
 	_apply_book_upgrades()
-	setup_hit_flash()
+	health_changed.emit(health, max_health)
+	sprite.material = flash_material
+
+
+func _stat_multiplier(stat: StringName) -> float:
+	return 1.0 + RunState.stat_percent(stat) / 100.0
 
 
 func _apply_book_upgrades() -> void:
-	max_jumps = 2 if RunState.double_jump else 1
-	var new_max := BASE_HEALTH + RunState.health_bonus
+	var jump_limit := 2 if RunState.has_passive(&"jump") else 1
+	var dash_limit := 2 if RunState.has_passive(&"double_dash") else 1
+	# Новую воздушную попытку можно потратить сразу, даже если книга открылась в прыжке.
+	jumps_left = clampi(jumps_left + jump_limit - max_jumps, 0, jump_limit)
+	dashes_left = clampi(dashes_left + dash_limit - max_dashes, 0, dash_limit)
+	max_jumps = jump_limit
+	max_dashes = dash_limit
+	var new_max := roundi(BASE_HEALTH * _stat_multiplier(&"health"))
 	if new_max != max_health:
 		health = clampi(health + new_max - max_health, 0, new_max)
 		max_health = new_max
 		health_changed.emit(health, max_health)
+	_check_low_health_shield()
+
+
+func _check_low_health_shield() -> void:
+	if RunState.has_passive(&"low_health_shield") and not RunState.shield_spent and health > 0 and health * 4 < max_health:
+		RunState.shield_spent = true
+		shield = ceili(max_health / 4.0)
+		shield_changed.emit(shield)
 
 
 func _physics_process(delta: float) -> void:
@@ -109,7 +128,7 @@ func read_input() -> void:
 	if Input.is_action_just_pressed("dash") and can_dash():
 		start_dash()
 
-	if Input.is_action_just_pressed("shoot") and can_shoot():
+	if (Input.is_action_pressed("shoot") or Input.is_action_just_pressed("shoot")) and can_shoot():
 		shoot()
 	if Input.is_action_just_pressed("change") and has_book_and_wand and state != State.DEAD:
 		switch_element()
@@ -131,18 +150,26 @@ func read_input() -> void:
 # --- Здоровье ---
 
 func take_damage(amount: int, source_position := Vector2.INF) -> void:
-	if state == State.DEAD or invulnerable_left > 0.0:
+	if amount <= 0 or state == State.DEAD or invulnerable_left > 0.0:
+		return
+	if state == State.DASH and RunState.has_passive(&"dash_invulnerable"):
 		return
 
-	health = maxi(health - amount, 0)
-	health_changed.emit(health, max_health)
-	if health == 0:
-		die()
-		return
+	var absorbed := mini(shield, amount)
+	if absorbed > 0:
+		shield -= absorbed
+		shield_changed.emit(shield)
+	if amount > absorbed:
+		health = maxi(health - (amount - absorbed), 0)
+		health_changed.emit(health, max_health)
+		if health == 0:
+			die()
+			return
+		_check_low_health_shield()
 
 	invulnerable_left = INVULNERABILITY_TIME
 	start_hurt(source_position)
-	play_hit_flash()
+	flash_material.flash(sprite, HIT_FLASH_TIME)
 
 
 func heal(amount: int) -> void:
@@ -180,21 +207,6 @@ func start_hurt(source_position: Vector2) -> void:
 	velocity = Vector2(dir * KNOCKBACK_SPEED.x, -KNOCKBACK_SPEED.y)
 	is_jumping = false
 	fall_time = 0.0
-
-
-func setup_hit_flash() -> void:
-	flash_material = ShaderMaterial.new()
-	flash_material.shader = HIT_FLASH_SHADER
-	flash_material.set_shader_parameter("flash_amount", 0.0)
-	sprite.material = flash_material
-
-
-func play_hit_flash() -> void:
-	if flash_tween:
-		flash_tween.kill()
-	flash_material.set_shader_parameter("flash_amount", 1.0)
-	flash_tween = create_tween()
-	flash_tween.tween_property(flash_material, "shader_parameter/flash_amount", 0.0, HIT_FLASH_TIME)
 
 
 func update_invulnerability(delta: float) -> void:
@@ -247,16 +259,17 @@ func can_jump() -> bool:
 
 
 func can_dash() -> bool:
-	return state == State.NORMAL and dashes_left > 0 and dash_cooldown_left <= 0.0
+	return state == State.NORMAL and dashes_left > 0 and (dash_cooldown_left <= 0.0 or max_dashes == 2)
 
 func can_shoot() -> bool:
-	return has_book_and_wand and current_element != Element.Type.NONE and state == State.NORMAL and shoot_cooldown_left <= 0.0
+	return (has_book_and_wand and current_element != Element.Type.NONE
+			and state in [State.NORMAL, State.ATTACK] and shoot_cooldown_left <= 0.0)
 
 
 # --- Движение ---
 
 func apply_horizontal_movement() -> void:
-	velocity.x = direction_x * SPEED * (1.0 + 0.1 * RunState.speed_steps)
+	velocity.x = direction_x * SPEED * _stat_multiplier(&"speed")
 
 
 func apply_gravity(delta: float) -> void:
@@ -277,11 +290,17 @@ func apply_gravity(delta: float) -> void:
 func shoot() -> void:
 	state = State.ATTACK
 	state_time_left = ATTACK_DURATION
-	shoot_cooldown_left = SHOOT_COOLDOWN
+	var shots_per_second := BASE_SHOTS_PER_SECOND * _stat_multiplier(&"fire_rate")
+	shoot_cooldown_left = minf(shoot_cooldown_left, 0.0) + 1.0 / shots_per_second
+	sprite.play("attack")
+	sprite.set_frame_and_progress(0, 0.0)
 
 	var shot := PROJECTILE_SCENE.instantiate() as projectile
-	shot.damage += RunState.damage_bonus
-	shot.lifetime *= 1.0 + 0.25 * RunState.range_steps
+	# При базовом уроне 1 каждые десять выстрелов с бонусом 10% дают единицу урона.
+	var damage_hundredths := shot.damage * (100 + RunState.stat_percent(&"damage")) + RunState.damage_remainder
+	shot.damage = floori(damage_hundredths / 100.0)
+	RunState.damage_remainder = damage_hundredths % 100
+	shot.lifetime *= _stat_multiplier(&"range")
 	# Добавляем в сцену, а не к игроку, иначе снаряд будет двигаться вместе с ним
 	get_tree().current_scene.add_child(shot)
 
@@ -341,7 +360,8 @@ func update_timers(delta: float) -> void:
 	dash_cooldown_left = maxf(dash_cooldown_left - delta, 0.0)
 	coyote_time_left = maxf(coyote_time_left - delta, 0.0)
 	jump_buffer_left = maxf(jump_buffer_left - delta, 0.0)
-	shoot_cooldown_left = maxf(shoot_cooldown_left - delta, 0.0)
+	# При удержании переносим долю кадра в следующий выстрел, сохраняя заданный темп.
+	shoot_cooldown_left = shoot_cooldown_left - delta if shoot_cooldown_left > 0.0 else 0.0
 
 	if state in [State.DASH, State.HURT, State.ATTACK]:
 		state_time_left -= delta
@@ -354,7 +374,8 @@ func update_timers(delta: float) -> void:
 func update_ground_state() -> void:
 	if is_on_floor():
 		jumps_left = max_jumps
-		dashes_left = max_dashes
+		if max_dashes == 1 or dash_cooldown_left <= 0.0:
+			dashes_left = max_dashes
 		is_jumping = false
 		fall_time = 0.0
 		coyote_time_left = COYOTE_TIME

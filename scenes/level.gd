@@ -8,6 +8,7 @@ extends Node2D
 ]
 
 const FLOOR_ATLAS := 1
+const SLIME := preload("res://scenes/enemies/base_enemy.tscn")
 const LEFT_EDGE := Vector2i(6, 5)
 const MIDDLE := Vector2i(7, 5)
 const RIGHT_EDGE := Vector2i(8, 5)
@@ -16,6 +17,9 @@ const RIGHT_EDGE := Vector2i(8, 5)
 
 
 func _ready() -> void:
+	var spawn_button: Button = $entities/player/GameUI.get_node("%SpawnEnemy")
+	spawn_button.show()
+	spawn_button.pressed.connect(_spawn_enemy)
 	if RunState.slots.is_empty():
 		RunState.open_first_page()
 	var rng := RunState.map_rng()
@@ -29,6 +33,24 @@ func _ready() -> void:
 	for entity in $entities.get_children():
 		if entity is BaseEnemy:
 			entity.died.connect(RunState.gain_experience.bind(1))
+
+
+func _spawn_enemy() -> void:
+	if get_tree().paused:
+		return
+	var witch := $entities/player
+	for side: float in [witch.facing, -witch.facing]:
+		var cell := terrain.local_to_map(terrain.to_local(witch.global_position + Vector2(side * 128, -32)))
+		for row in range(cell.y, terrain.get_used_rect().end.y):
+			var ground := Vector2i(cell.x, row)
+			if terrain.get_cell_source_id(ground) < 0 or terrain.get_cell_source_id(ground + Vector2i.UP) >= 0:
+				continue
+			var slime: BaseEnemy = SLIME.instantiate()
+			slime.maxHealth = 5
+			slime.position = $entities.to_local(terrain.to_global(terrain.map_to_local(ground + Vector2i.UP)))
+			$entities.add_child(slime)
+			slime.died.connect(RunState.gain_experience.bind(1))
+			return
 
 
 func place_platform(start: Vector2i, width: int) -> void:

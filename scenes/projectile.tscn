@@ -2,6 +2,7 @@
 
 [ext_resource type="Script" uid="uid://c4hpga6ie2wo0" path="res://scenes/projectile.gd" id="1_c8fcr"]
 [ext_resource type="Shader" path="res://scenes/shaders/water_drop.gdshader" id="2_spell"]
+[ext_resource type="Script" path="res://scenes/effects/element_particles.gd" id="3_trail"]
 
 [sub_resource type="RectangleShape2D" id="RectangleShape2D_q3m7n"]
 size = Vector2(6, 6)
@@ -16,6 +17,11 @@ script = ExtResource("1_c8fcr")
 
 [node name="CollisionShape2D" type="CollisionShape2D" parent="." unique_id=899632052]
 shape = SubResource("RectangleShape2D_q3m7n")
+
+[node name="Trail" type="CPUParticles2D" parent="."]
+position = Vector2(-6, 0)
+emitting = false
+script = ExtResource("3_trail")
 
 [node name="Spell" type="ColorRect" parent="."]
 material = SubResource("SpellMaterial")

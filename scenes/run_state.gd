@@ -7,19 +7,8 @@ const COVEN := "res://scenes/coven.tscn"
 # Разные постоянные дают независимые последовательности из одного сида.
 const BOOK_SEED_SALT := 0x424f4f4b
 const MAP_SEED_SALT := 0x4d415000
-const ELEMENT_PAGES := {
-	&"water": Element.Type.WATER,
-	&"fire": Element.Type.FIRE,
-	&"ice": Element.Type.ICE,
-	&"electric": Element.Type.ELECTRIC,
-}
-const STAT_TITLES := {
-	&"damage": "Урон +1",
-	&"range": "Дальность +25%",
-	&"health": "Здоровье +2",
-	&"speed": "Скорость +10%",
-	&"jump": "Двойной прыжок",
-}
+const Pages := preload("res://scenes/book_pages.gd")
+const ELEMENT_PAGES := Pages.ELEMENTS
 
 var run_seed: int
 var level: int
@@ -28,11 +17,10 @@ var experience_needed: int
 var slots: Array[Element.Type] = []
 var active_slot: int
 var pending_choices: Array[StringName] = []
-var damage_bonus: int
-var range_steps: int
-var health_bonus: int
-var speed_steps: int
-var double_jump: bool
+var shield_spent := false
+var damage_remainder := 0
+var _stat_bonuses: Dictionary[StringName, int] = {}
+var _passives: Array[StringName] = []
 var _opening_page_read: bool
 var _book_rng := RandomNumberGenerator.new()
 
@@ -50,11 +38,10 @@ func _start_run(value: int) -> void:
 	slots.clear()
 	active_slot = 0
 	pending_choices.clear()
-	damage_bonus = 0
-	range_steps = 0
-	health_bonus = 0
-	speed_steps = 0
-	double_jump = false
+	_stat_bonuses.clear()
+	_passives.clear()
+	shield_spent = false
+	damage_remainder = 0
 	_opening_page_read = false
 	changed.emit()
 
@@ -84,7 +71,7 @@ func open_first_page() -> void:
 	if _opening_page_read:
 		return
 	_opening_page_read = true
-	_deal(_available_elements(), 2)
+	pending_choices = Pages.deal(_book_rng, slots, _passives, true)
 	changed.emit()
 
 
@@ -108,35 +95,23 @@ func _check_level_up() -> void:
 	experience -= experience_needed
 	level += 1
 	experience_needed = level
-	var pool := _available_elements()
-	pool.append_array([&"damage", &"range", &"health", &"speed"])
-	if not double_jump:
-		pool.append(&"jump")
-	_deal(pool)
+	pending_choices = Pages.deal(_book_rng, slots, _passives, false, stat_percent(&"luck"))
 
 
-func _available_elements() -> Array[StringName]:
-	var pages: Array[StringName] = []
-	for page: StringName in ELEMENT_PAGES:
-		if not slots.has(ELEMENT_PAGES[page]):
-			pages.append(page)
-	return pages
-
-
-func _deal(pool: Array[StringName], count := 3) -> void:
-	pending_choices.clear()
-	for i in mini(count, pool.size()):
-		var index := _book_rng.randi_range(0, pool.size() - 1)
-		pending_choices.append(pool.pop_at(index))
+func upgrade_rarity(id: StringName) -> int:
+	return Pages.rarity(id)
 
 
 func upgrade_title(id: StringName) -> String:
-	if not ELEMENT_PAGES.has(id):
-		return STAT_TITLES.get(id, str(id))
-	var title: String = Element.DISPLAY_NAMES[ELEMENT_PAGES[id]]
-	if slots.size() == 2:
-		return "%s вместо %s" % [title, Element.DISPLAY_NAMES[slots[active_slot]]]
-	return title
+	return Pages.title(id, slots, active_slot)
+
+
+func stat_percent(id: StringName) -> int:
+	return _stat_bonuses.get(id, 0)
+
+
+func has_passive(id: StringName) -> bool:
+	return _passives.has(id)
 
 
 func choose_upgrade(id: StringName) -> void:
@@ -147,13 +122,11 @@ func choose_upgrade(id: StringName) -> void:
 			slots.append(ELEMENT_PAGES[id])
 		else:
 			slots[active_slot] = ELEMENT_PAGES[id]
+	elif Pages.PASSIVES.has(id):
+		_passives.append(id)
 	else:
-		match id:
-			&"damage": damage_bonus += 1
-			&"range": range_steps += 1
-			&"health": health_bonus += 2
-			&"speed": speed_steps += 1
-			&"jump": double_jump = true
+		var stat := Pages.stat_id(id)
+		_stat_bonuses[stat] = stat_percent(stat) + Pages.percent(id)
 	pending_choices.clear()
 	_check_level_up()
 	changed.emit()

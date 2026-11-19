@@ -1,5 +1,6 @@
 [gd_scene format=3 uid="uid://v5xlbsqkk1eu"]
 
+[ext_resource type="Script" uid="uid://s8u5ji5c7trp" path="res://scenes/ui/book_cover.gd" id="cover"]
 [ext_resource type="Script" uid="uid://0vgabd78ig8p" path="res://scenes/ui/game_ui.gd" id="Script"]
 
 [sub_resource type="StyleBoxFlat" id="Focus"]
@@ -104,10 +105,20 @@ mouse_filter = 2
 layout_mode = 2
 mouse_filter = 2
 
-[node name="HealthText" type="Label" parent="Root/Vitals/Rows" unique_id=36708208]
+[node name="Defense" type="HBoxContainer" parent="Root/Vitals/Rows" unique_id=594384090]
+layout_mode = 2
+theme_override_constants/separation = 10
+
+[node name="HealthText" type="Label" parent="Root/Vitals/Rows/Defense" unique_id=36708208]
 unique_name_in_owner = true
 layout_mode = 2
 text = "Здоровье"
+
+[node name="ShieldText" type="Label" parent="Root/Vitals/Rows/Defense" unique_id=402195854]
+unique_name_in_owner = true
+layout_mode = 2
+theme_override_colors/font_color = Color(0.62, 0.84, 0.97, 1)
+text = "Щит  0"
 
 [node name="Health" type="ProgressBar" parent="Root/Vitals/Rows" unique_id=1379542440]
 unique_name_in_owner = true
@@ -140,40 +151,14 @@ tooltip_text = "Новый забег (F2)"
 focus_mode = 0
 text = "Сид"
 
-[node name="Slots" type="PanelContainer" parent="Root" unique_id=879034453]
+[node name="SpawnEnemy" type="Button" parent="Root" unique_id=40470099]
 unique_name_in_owner = true
-layout_mode = 1
-anchors_preset = 2
-anchor_top = 1.0
-anchor_bottom = 1.0
-offset_left = 403.0
-offset_top = -37.0
-offset_right = 635.0
-offset_bottom = -8.0
-grow_vertical = 0
-mouse_filter = 2
-
-[node name="Row" type="HBoxContainer" parent="Root/Slots" unique_id=1472445783]
-layout_mode = 2
-mouse_filter = 2
-theme_override_constants/separation = 12
-
-[node name="SlotOne" type="Label" parent="Root/Slots/Row" unique_id=447120721]
-unique_name_in_owner = true
-layout_mode = 2
-text = "▶ Вода"
-
-[node name="SlotTwo" type="Label" parent="Root/Slots/Row" unique_id=1162021149]
-unique_name_in_owner = true
-layout_mode = 2
-text = "· Пусто"
-
-[node name="SwitchHint" type="Label" parent="Root/Slots/Row" unique_id=1580120468]
-unique_name_in_owner = true
-layout_mode = 2
-theme_override_colors/font_color = Color(0.77, 0.73, 0.76, 1)
-theme_override_font_sizes/font_size = 10
-text = "Смена не назначена"
+visible = false
+layout_mode = 0
+offset_left = 9.0
+offset_top = 80.0
+focus_mode = 0
+text = "+ Слизень"
 
 [node name="Overlay" type="ColorRect" parent="Root" unique_id=1167200954]
 unique_name_in_owner = true
@@ -195,29 +180,6 @@ grow_vertical = 2
 [node name="Paper" type="PanelContainer" parent="Root/Overlay/Center" unique_id=192184018]
 custom_minimum_size = Vector2(298, 0)
 layout_mode = 2
-
-[node name="Book" type="VBoxContainer" parent="Root/Overlay/Center/Paper" unique_id=1992456439]
-unique_name_in_owner = true
-visible = false
-layout_mode = 2
-theme_override_constants/separation = 8
-
-[node name="Title" type="Label" parent="Root/Overlay/Center/Paper/Book" unique_id=1208092606]
-layout_mode = 2
-theme_override_colors/font_color = Color(1, 0.85, 0.64, 1)
-theme_override_font_sizes/font_size = 19
-text = "Книга улучшений"
-horizontal_alignment = 1
-
-[node name="Hint" type="Label" parent="Root/Overlay/Center/Paper/Book" unique_id=61589231]
-layout_mode = 2
-text = "Выбери одну страницу"
-horizontal_alignment = 1
-
-[node name="Choices" type="VBoxContainer" parent="Root/Overlay/Center/Paper/Book" unique_id=157836907]
-unique_name_in_owner = true
-layout_mode = 2
-theme_override_constants/separation = 5
 
 [node name="SeedMenu" type="VBoxContainer" parent="Root/Overlay/Center/Paper" unique_id=593464639]
 unique_name_in_owner = true
@@ -264,3 +226,60 @@ text = "Отмена"
 unique_name_in_owner = true
 layout_mode = 2
 text = "Начать забег"
+
+[node name="Grimoire" type="Control" parent="Root" unique_id=403409503]
+unique_name_in_owner = true
+texture_filter = 1
+anchors_preset = 0
+mouse_filter = 2
+script = ExtResource("cover")
+
+[node name="Icon" type="TextureRect" parent="Root/Grimoire" unique_id=145203372]
+unique_name_in_owner = true
+texture_filter = 1
+layout_mode = 0
+mouse_filter = 0
+expand_mode = 1
+stretch_mode = 5
+
+[node name="ElementButton" type="Button" parent="Root/Grimoire" unique_id=185200084]
+unique_name_in_owner = true
+layout_mode = 0
+focus_mode = 0
+theme_override_colors/font_color = Color(0.22, 0.13, 0.17, 1)
+theme_override_colors/font_hover_color = Color(0.35, 0.16, 0.18, 1)
+theme_override_colors/font_disabled_color = Color(0.22, 0.13, 0.17, 1)
+theme_override_font_sizes/font_size = 9
+flat = true
+
+[node name="Stats" type="Label" parent="Root/Grimoire" unique_id=12371444]
+unique_name_in_owner = true
+layout_mode = 0
+theme_override_colors/font_color = Color(0.21, 0.14, 0.19, 1)
+theme_override_constants/line_spacing = 0
+theme_override_font_sizes/font_size = 8
+
+[node name="PageNote" type="Label" parent="Root/Grimoire" unique_id=1810087360]
+unique_name_in_owner = true
+layout_mode = 0
+theme_override_colors/font_color = Color(0.26, 0.16, 0.19, 1)
+theme_override_font_sizes/font_size = 14
+horizontal_alignment = 1
+autowrap_mode = 3
+
+[node name="Book" type="VBoxContainer" parent="Root/Grimoire" unique_id=1616117246]
+unique_name_in_owner = true
+visible = false
+layout_mode = 0
+theme_override_constants/separation = 4
+
+[node name="Title" type="Label" parent="Root/Grimoire/Book" unique_id=610317372]
+layout_mode = 2
+theme_override_colors/font_color = Color(0.24, 0.14, 0.17, 1)
+text = "Выбери страницу"
+horizontal_alignment = 1
+
+[node name="Choices" type="VBoxContainer" parent="Root/Grimoire/Book" unique_id=1656125630]
+unique_name_in_owner = true
+layout_mode = 2
+theme_override_constants/separation = 3

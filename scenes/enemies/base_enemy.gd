@@ -8,7 +8,7 @@ const ALERT_RANGE_BONUS := 50.0
 # Горизонтальный толчок от обычного снаряда сдвигает врага примерно на 3 пикселя.
 const HIT_PUSH_SPEED := 55.0
 const HIT_PUSH_DECAY := 600.0
-const HIT_FLASH_SHADER := preload("res://scenes/shaders/hit.gdshader")
+const HitMaterial := preload("res://scenes/effects/hit_material.gd")
 const HIT_FLASH_TIME := 0.15
 
 @export_group("Движение и обнаружение")
@@ -30,8 +30,7 @@ var isDead := false
 var isHitted := false
 var knockback_velocity := 0.0
 var knockback_decay := 0.0
-var flash_material: ShaderMaterial
-var flash_tween: Tween
+var flash_material := HitMaterial.new()
 
 @onready var anim: AnimatedSprite2D = $AnimatedSprite2D
 @onready var hitbox: Area2D = $Hitbox
@@ -43,7 +42,7 @@ func _ready() -> void:
 	health = maxHealth
 	add_to_group(ENEMY_GROUP)
 	player = get_tree().get_first_node_in_group("player") as Node2D
-	setup_hit_flash()
+	anim.material = flash_material
 	states.init()
 
 func _physics_process(delta: float) -> void:
@@ -88,7 +87,7 @@ func takeDamage(amount: int) -> void:
 	if health <= 0:
 		die()
 		return
-	play_hit_flash()
+	flash_material.flash(anim, HIT_FLASH_TIME)
 
 func die() -> void:
 	isDead = true
@@ -101,22 +100,6 @@ func apply_knockback(force: Vector2, decay := 800.0) -> void:
 	knockback_velocity = force.x
 	knockback_decay = decay
 	velocity.y = force.y
-
-# --- Вспышка при уроне ---
-
-func setup_hit_flash() -> void:
-	# Отдельный материал на каждого врага, иначе вспыхивали бы все сразу
-	flash_material = ShaderMaterial.new()
-	flash_material.shader = HIT_FLASH_SHADER
-	flash_material.set_shader_parameter("flash_amount", 0.0)
-	anim.material = flash_material
-
-func play_hit_flash() -> void:
-	if flash_tween:
-		flash_tween.kill()
-	flash_material.set_shader_parameter("flash_amount", 1.0)
-	flash_tween = create_tween()
-	flash_tween.tween_property(flash_material, "shader_parameter/flash_amount", 0.0, HIT_FLASH_TIME)
 
 func distanceBetween() -> float:
 	if not is_instance_valid(player):
