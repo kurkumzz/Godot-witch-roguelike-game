@@ -3,7 +3,7 @@
 [ext_resource type="Script" uid="uid://cvxvn0qj133t5" path="res://scenes/coven.gd" id="1"]
 [ext_resource type="PackedScene" uid="uid://geegx138cdxf" path="res://scenes/player.tscn" id="2"]
 [ext_resource type="PackedScene" uid="uid://weerhbpq7a34" path="res://scenes/parallaxBack/swamp_paral.tscn" id="3"]
-[ext_resource type="Texture2D" path="res://graphics/book_and_staff.png" id="Gear"]
+[ext_resource type="Texture2D" uid="uid://cw7fpjbkg847c" path="res://graphics/book_and_staff.png" id="Gear"]
 [ext_resource type="Script" uid="uid://7rxmkynxg2ff" path="res://scenes/pickup_rays.gd" id="Rays"]
 
 [sub_resource type="RectangleShape2D" id="FloorShape"]
@@ -31,7 +31,6 @@ fill_to = Vector2(1, 0.5)
 script = ExtResource("1")
 
 [node name="Swamp" parent="." unique_id=2124639749 instance=ExtResource("3")]
-position = Vector2(0, 0)
 
 [node name="RoomCamera" type="Camera2D" parent="." unique_id=1515770442]
 process_callback = 0

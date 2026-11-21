@@ -1,6 +1,6 @@
 extends Node2D
 
-const FIRST_LEVEL := preload("res://scenes/level.tscn")
+const FIRST_LEVEL := preload("res://generation/SwampRun.tscn")
 const PICKUP_RISE := 48.0
 
 @onready var player := $Spawn/Player
