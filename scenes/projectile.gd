@@ -1,6 +1,10 @@
 class_name projectile
 extends Area2D
 
+signal launched(element_type: Element.Type)
+signal dispersed(on_contact: bool)
+signal enemy_hit(world_position: Vector2)
+
 @export var speed := 300.0
 @export var damage := 1
 @export var lifetime := 1.5
@@ -16,13 +20,13 @@ func launch(from: Vector2, dir: Vector2, owner_node: Node, elem: Element.Type = 
 	rotation = direction.angle()
 	shooter = owner_node
 	element = elem
-	modulate = Element.COLORS[element]
 	reset_physics_interpolation()
+	launched.emit(element)
 
 
 func _ready() -> void:
 	body_entered.connect(_on_body_entered)
-	get_tree().create_timer(lifetime).timeout.connect(queue_free)
+	get_tree().create_timer(lifetime, false).timeout.connect(_disperse.bind(false))
 
 
 func _physics_process(delta: float) -> void:
@@ -30,17 +34,22 @@ func _physics_process(delta: float) -> void:
 
 
 func _on_body_entered(body: Node2D) -> void:
-	if body == shooter:
+	if body == shooter or is_queued_for_deletion():
 		return
 	if body is BaseEnemy:
 		hit_enemy(body)
+	_disperse(true)
+
+
+func _disperse(on_contact: bool) -> void:
+	if is_queued_for_deletion():
+		return
 	queue_free()
+	dispersed.emit(on_contact)
 
 
 func hit_enemy(enemy: BaseEnemy) -> void:
-	var final_damage := damage
-	var status := enemy.get_node_or_null("statusComp") as statusComp
-	if status:
-		# direction нужен для отбрасывания при перегрузке
-		final_damage = status.process_hit(element, damage, direction)
-	enemy.takeDamage(final_damage)
+	if enemy.isDead:
+		return
+	enemy.receive_projectile(element, damage, direction)
+	enemy_hit.emit(global_position)

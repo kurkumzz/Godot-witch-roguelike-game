@@ -1,0 +1,41 @@
+[gd_scene format=3]
+
+[ext_resource type="Texture2D" path="res://scenes/effects/soft_light.tres" id="soft"]
+
+[sub_resource type="CanvasItemMaterial" id="Flame"]
+light_mode = 1
+
+[node name="HearthCandle" type="Node2D"]
+
+[node name="Light" type="PointLight2D" parent="."]
+position = Vector2(0, -11)
+texture = ExtResource("soft")
+texture_scale = 2.9
+energy = 0.72
+color = Color(1, 0.73, 0.45, 1)
+range_z_min = -2
+
+[node name="Saucer" type="Polygon2D" parent="."]
+color = Color(0.48, 0.33, 0.19, 1)
+polygon = PackedVector2Array(-5, -2, 5, -2, 4, 0, -4, 0)
+
+[node name="Wax" type="Polygon2D" parent="."]
+color = Color(0.91, 0.76, 0.54, 1)
+polygon = PackedVector2Array(-2, -8, 1, -8, 2, -7, 2, -2, -2, -2)
+
+[node name="Halo" type="Sprite2D" parent="."]
+position = Vector2(0, -10)
+texture = ExtResource("soft")
+scale = Vector2(0.49, 0.55)
+self_modulate = Color(1, 0.65, 0.28, 0.34)
+material = SubResource("Flame")
+
+[node name="Flame" type="Polygon2D" parent="."]
+color = Color(1, 0.69, 0.30, 1)
+polygon = PackedVector2Array(0, -15, 1, -12, 2, -11, 2, -9, 1, -8, -1, -8, -2, -10, -1, -12)
+material = SubResource("Flame")
+
+[node name="Wick" type="Polygon2D" parent="."]
+color = Color(1, 0.96, 0.77, 1)
+polygon = PackedVector2Array(0, -12, 1, -10, 1, -9, -1, -9, -1, -10)
+material = SubResource("Flame")

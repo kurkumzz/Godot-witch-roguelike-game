@@ -1,0 +1,18 @@
+[gd_scene format=3]
+
+[ext_resource type="Script" path="res://scenes/effects/player/staff_glow.gd" id="script"]
+[ext_resource type="Texture2D" path="res://scenes/effects/soft_light.tres" id="soft"]
+
+[node name="StaffGlow" type="Node2D"]
+script = ExtResource("script")
+
+[node name="Halo" type="Sprite2D" parent="."]
+show_behind_parent = true
+scale = Vector2(0.27, 0.27)
+texture = ExtResource("soft")
+
+[node name="Light" type="PointLight2D" parent="."]
+texture = ExtResource("soft")
+texture_scale = 0.9
+energy = 0.40
+range_z_min = -1

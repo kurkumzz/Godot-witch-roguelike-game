@@ -10,40 +10,49 @@ signal chain_jumped(from_pos: Vector2, to_pos: Vector2)   # для эффект�
 
 enum Status { WET, BURNING, CHILL, FROZEN, SHOCKED, CHARGED, FRAGILE }
 
+const ElementParticles := preload("res://scenes/effects/element_particles.gd")
+const PARTICLE_ELEMENT := {
+	Status.WET: Element.Type.WATER,
+	Status.BURNING: Element.Type.FIRE,
+	Status.CHILL: Element.Type.ICE,
+	Status.FROZEN: Element.Type.ICE,
+	Status.SHOCKED: Element.Type.ELECTRIC,
+	Status.CHARGED: Element.Type.ELECTRIC,
+}
+var status_particles: Dictionary[Status, CPUParticles2D] = {}
+
 # --- Мокрый ---
 const WET_DURATION := 5.0
-const WET_TINT := Color(0.6, 0.8, 1.0)
+const WET_TINT := Color(0.22, 0.44, 1.0, 0.80)
 
 # --- Горение ---
 const BURN_DURATION := 3.0
 const BURN_TICK_INTERVAL := 1.0   # раз в сколько секунд наносится урон
 const BURN_TICK_DAMAGE := 1
-const BURN_TINT := Color(1.0, 0.6, 0.5)
+const BURN_TINT := Color(1.0, 0.18, 0.12, 0.72)
 
 # --- Мерзлота ---
 const CHILL_DURATION := 4.0
 const CHILL_SPEED_MULTIPLIER := 0.5   # 0.5 = враг и его анимации вдвое медленнее
-const CHILL_TINT := Color(0.8, 1.0, 1.0)
+const CHILL_TINT := Color(0.42, 0.82, 1.0, 0.75)
 
 # --- Заморозка ---
 const FROZEN_DURATION := 2.0
-const FROZEN_TINT := Color(0.5, 0.95, 1.0)
+const FROZEN_TINT := Color(0.68, 0.94, 1.0, 0.9)
 
 # --- Наэлектризован (вешает электро, ждёт воду, огонь или лёд) ---
 const SHOCKED_DURATION := 4.0
-const SHOCKED_TINT := Color(1.0, 1.0, 0.6)
 
 # --- Заряд ---
 const CHARGED_DURATION := 3.0
 const CHARGED_TICK_INTERVAL := 1.0   # раз в сколько секунд урон + оглушение
 const CHARGED_TICK_DAMAGE := 1
 const CHARGED_STUN := 0.3            # на сколько секунд враг замирает
-const CHARGED_TINT := Color(1.0, 0.95, 0.4)
 
 # --- Хрупкий (после сверхпроводимости) ---
 const FRAGILE_DURATION := 4.0
 const FRAGILE_MULTIPLIER := 1.5      # весь входящий урон x1.5 (при уроне 1 округлится до 2)
-const FRAGILE_TINT := Color(0.85, 0.7, 1.0)
+const FRAGILE_TINT := Color(0.85, 0.7, 1.0, 0.45)
 
 # --- Реакции ---
 const VAPORIZE_MULTIPLIER := 1.5
@@ -54,12 +63,11 @@ const CHARGE_MULTIPLIER := 2.0
 
 const OVERLOAD_MULTIPLIER := 2.0
 const OVERLOAD_KNOCKBACK := Vector2(350.0, 200.0)   # x: сила толчка, y: подброс
-const OVERLOAD_KNOCKBACK_DECAY := 800.0             # дальность ≈ x² / (2 × decay) ≈ 190 пикс
+const OVERLOAD_KNOCKBACK_DECAY := 800.0
 
 const SHATTER_MULTIPLIER := 2.0
 
 # --- Цепь по льду ---
-const ENEMY_GROUP := "enemies"        # группа, в которую BaseEnemy добавляет себя сам
 const CHAIN_RADIUS := 160.0           # на каком расстоянии разряд ищет соседей
 const CHAIN_MAX_TARGETS := 2          # сколько врагов может задеть цепь
 const CHAIN_DAMAGE_FACTOR := 0.5      # доля урона удара, которая уходит соседям
@@ -83,7 +91,6 @@ var base_speed := 0.0
 var base_anim_speed := 1.0
 
 @onready var enemy := get_parent() as BaseEnemy
-@onready var sprite: CanvasItem = get_parent().get_node_or_null("AnimatedSprite2D")
 @onready var anim_sprite := get_parent().get_node_or_null("AnimatedSprite2D") as AnimatedSprite2D
 
 
@@ -259,7 +266,7 @@ func spread_chain(base_damage: int) -> void:
 		return
 
 	var targets: Array[statusComp] = []
-	for node in get_tree().get_nodes_in_group(ENEMY_GROUP):
+	for node in get_tree().get_nodes_in_group(BaseEnemy.ENEMY_GROUP):
 		var other := node as BaseEnemy
 		if other == null or other == enemy or other.isDead:
 			continue
@@ -306,6 +313,12 @@ func add_status(status: Status) -> void:
 	var is_new := not active.has(status)
 	active[status] = get_duration(status)
 	if is_new:
+		if PARTICLE_ELEMENT.has(status):
+			var particles := ElementParticles.new()
+			enemy.add_child(particles)
+			particles.z_index = 1
+			particles.configure(PARTICLE_ELEMENT[status], true)
+			status_particles[status] = particles
 		if status == Status.BURNING:
 			burn_tick_left = BURN_TICK_INTERVAL
 		elif status == Status.CHARGED:
@@ -317,6 +330,10 @@ func add_status(status: Status) -> void:
 
 func remove_status(status: Status) -> void:
 	if active.erase(status):
+		if status_particles.has(status):
+			status_particles[status].hide()
+			status_particles[status].queue_free()
+			status_particles.erase(status)
 		status_removed.emit(status)
 		update_visuals()
 		apply_movement_modifiers()
@@ -406,31 +423,27 @@ func apply_movement_modifiers() -> void:
 
 
 func update_visuals() -> void:
-	if sprite == null:
+	if enemy == null or enemy.flash_material == null:
 		return
-	# Приоритет цвета: заморозка > заряд > горение > хрупкий > мерзлота > наэлектризован > мокрый
+	# Электричество помечается искрами и сохраняет исходный цвет спрайта.
+	var tint := Color.TRANSPARENT
 	if has_status(Status.FROZEN):
-		sprite.modulate = FROZEN_TINT
-	elif has_status(Status.CHARGED):
-		sprite.modulate = CHARGED_TINT
+		tint = FROZEN_TINT
 	elif has_status(Status.BURNING):
-		sprite.modulate = BURN_TINT
+		tint = BURN_TINT
 	elif has_status(Status.FRAGILE):
-		sprite.modulate = FRAGILE_TINT
+		tint = FRAGILE_TINT
 	elif has_status(Status.CHILL):
-		sprite.modulate = CHILL_TINT
-	elif has_status(Status.SHOCKED):
-		sprite.modulate = SHOCKED_TINT
+		tint = CHILL_TINT
 	elif has_status(Status.WET):
-		sprite.modulate = WET_TINT
-	else:
-		sprite.modulate = Color.WHITE
+		tint = WET_TINT
+	enemy.flash_material.set_shader_parameter("status_tint", tint)
 
 
 # --- Отладочная надпись ---
 
 func create_debug_label() -> void:
-	debug_label = Label.new()
+	debug_label = enemy.get_node("Label") as Label
 	debug_label.position = label_offset
 	debug_label.custom_minimum_size = Vector2(60, 0)
 	debug_label.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
@@ -438,7 +451,30 @@ func create_debug_label() -> void:
 	debug_label.add_theme_color_override("font_outline_color", Color.BLACK)
 	debug_label.add_theme_constant_override("outline_size", 3)
 	debug_label.visible = false
-	get_parent().add_child.call_deferred(debug_label)
+	var icons := HBoxContainer.new()
+	icons.position = label_offset - Vector2(12, 11)
+	icons.size.x = 84
+	icons.alignment = BoxContainer.ALIGNMENT_CENTER
+	icons.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	icons.texture_filter = CanvasItem.TEXTURE_FILTER_NEAREST
+	icons.add_theme_constant_override("separation", 2)
+	enemy.add_child.call_deferred(icons)
+	for status in Status.values():
+		var element: Element.Type = PARTICLE_ELEMENT.get(status, Element.Type.ICE)
+		var icon := TextureRect.new()
+		icon.texture = ElementParticles.TEXTURES[element]
+		icon.modulate = FRAGILE_TINT.lightened(0.2) if status == Status.FRAGILE else Element.COLORS[element]
+		icon.modulate.a = 1
+		icon.expand_mode = TextureRect.EXPAND_IGNORE_SIZE
+		icon.stretch_mode = TextureRect.STRETCH_KEEP_ASPECT_CENTERED
+		icon.custom_minimum_size = Vector2(10, 10)
+		icon.mouse_filter = Control.MOUSE_FILTER_IGNORE
+		icons.add_child(icon)
+		icon.visible = has_status(status)
+		status_added.connect(func(added: Status): 
+			if added == status: icon.show())
+		status_removed.connect(func(removed: Status):
+			if removed == status: icon.hide())
 
 
 func update_debug_label() -> void:
@@ -450,8 +486,6 @@ func update_debug_label() -> void:
 		lines.append("HP %d/%d" % [maxi(enemy.health, 0), enemy.maxHealth])
 	if reaction_time_left > 0.0:
 		lines.append("! %s !" % reaction_text)
-	for status in active:
-		lines.append("%s %.1f" % [Status.keys()[status], active[status]])
 
 	debug_label.visible = not lines.is_empty()
 	debug_label.text = "\n".join(lines)

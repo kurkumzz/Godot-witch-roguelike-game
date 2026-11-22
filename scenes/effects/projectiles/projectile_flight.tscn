@@ -1,0 +1,47 @@
+[gd_scene format=3]
+
+[ext_resource type="Script" path="res://scenes/effects/projectiles/projectile_flight.gd" id="1_flight"]
+[ext_resource type="Texture2D" path="res://scenes/effects/soft_light.tres" id="2_light"]
+[ext_resource type="Script" path="res://scenes/effects/element_particles.gd" id="3_trail"]
+[ext_resource type="Shader" path="res://scenes/shaders/water_drop.gdshader" id="4_shader"]
+
+[sub_resource type="ShaderMaterial" id="CoreMaterial"]
+resource_local_to_scene = true
+shader = ExtResource("4_shader")
+
+[sub_resource type="CanvasItemMaterial" id="Additive"]
+blend_mode = 1
+light_mode = 1
+
+[sub_resource type="Gradient" id="TrailFade"]
+offsets = PackedFloat32Array(0, 0.4, 1)
+colors = PackedColorArray(1, 1, 1, 1, 1, 1, 1, 0.88, 1, 1, 1, 0)
+
+[node name="Flight" type="Node2D"]
+z_index = 3
+script = ExtResource("1_flight")
+
+[node name="Light" type="PointLight2D" parent="."]
+texture = ExtResource("2_light")
+texture_scale = 0.95
+energy = 0.55
+
+[node name="Halo" type="Sprite2D" parent="."]
+material = SubResource("Additive")
+texture = ExtResource("2_light")
+position = Vector2(-3, 0)
+scale = Vector2(0.7, 0.40)
+
+[node name="Trail" type="CPUParticles2D" parent="."]
+position = Vector2(-8, 0)
+emitting = false
+color_ramp = SubResource("TrailFade")
+script = ExtResource("3_trail")
+
+[node name="Core" type="ColorRect" parent="."]
+material = SubResource("CoreMaterial")
+offset_left = -17.0
+offset_top = -7.0
+offset_right = 7.0
+offset_bottom = 7.0
+mouse_filter = 2

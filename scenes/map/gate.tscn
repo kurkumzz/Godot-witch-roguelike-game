@@ -1,0 +1,29 @@
+[gd_scene format=3]
+
+[ext_resource type="Script" path="res://scenes/map/gate.gd" id="script"]
+[ext_resource type="Texture2D" path="res://graphics/coven_gate.png" id="art"]
+
+[sub_resource type="RectangleShape2D" id="Shape"]
+size = Vector2(72, 76)
+
+[node name="Gate" type="Sprite2D"]
+texture = ExtResource("art")
+offset = Vector2(0, -39)
+script = ExtResource("script")
+
+[node name="Trigger" type="Area2D" parent="."]
+collision_layer = 0
+collision_mask = 2
+
+[node name="Shape" type="CollisionShape2D" parent="Trigger"]
+position = Vector2(0, -38)
+shape = SubResource("Shape")
+
+[node name="Hint" type="Label" parent="."]
+visible = false
+offset_left = -70
+offset_right = 70
+offset_top = -96
+horizontal_alignment = 1
+theme_override_constants/outline_size = 3
+theme_override_font_sizes/font_size = 11

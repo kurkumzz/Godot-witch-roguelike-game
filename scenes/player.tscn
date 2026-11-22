@@ -1,6 +1,10 @@
 [gd_scene format=3 uid="uid://geegx138cdxf"]
 
 [ext_resource type="Script" uid="uid://cn1v1gy5libro" path="res://scenes/player.gd" id="1_3vyb7"]
+[ext_resource type="PackedScene" path="res://scenes/ui/game_ui.tscn" id="ui"]
+[ext_resource type="PackedScene" path="res://scenes/effects/player/staff_glow.tscn" id="glow"]
+[ext_resource type="Script" path="res://scenes/effects/player/movement_feedback.gd" id="motion"]
+[ext_resource type="Script" path="res://scenes/effects/player/hit_feedback.gd" id="hit"]
 [ext_resource type="Texture2D" uid="uid://tao6r8ugcgtx" path="res://graphics/characters/ggSprite.png" id="2_qhqgy"]
 
 [sub_resource type="RectangleShape2D" id="RectangleShape2D_2ktqi"]
@@ -275,7 +279,6 @@ animations = [{
 [node name="player" type="CharacterBody2D" unique_id=1179664223 groups=["player"]]
 collision_layer = 2
 script = ExtResource("1_3vyb7")
-show_element_debug = null
 
 [node name="CollisionShape2D" type="CollisionShape2D" parent="." unique_id=1460352614]
 shape = SubResource("RectangleShape2D_2ktqi")
@@ -289,7 +292,24 @@ drag_vertical_enabled = true
 editor_draw_limits = true
 
 [node name="AnimatedSprite2D" type="AnimatedSprite2D" parent="." unique_id=463181992]
+z_index = 1
 sprite_frames = SubResource("SpriteFrames_2ktqi")
 animation = &"attack"
 frame = 4
 frame_progress = 1.0
+
+[node name="GameUI" parent="." instance=ExtResource("ui")]
+
+[node name="StaffGlow" parent="AnimatedSprite2D" instance=ExtResource("glow")]
+
+[node name="MovementFeedback" type="Node2D" parent="."]
+script = ExtResource("motion")
+
+[node name="HitFeedback" type="Node" parent="."]
+script = ExtResource("hit")
+
+[connection signal="jumped" from="." to="MovementFeedback" method="on_jump"]
+[connection signal="landed" from="." to="MovementFeedback" method="on_land"]
+[connection signal="dash_started" from="." to="MovementFeedback" method="on_dash"]
+[connection signal="projectile_fired" from="." to="HitFeedback" method="watch_shot"]
+[connection signal="hurt" from="." to="HitFeedback" method="on_hit"]

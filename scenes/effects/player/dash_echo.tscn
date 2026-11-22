@@ -1,0 +1,15 @@
+[gd_scene format=3]
+
+[ext_resource type="Script" path="res://scenes/effects/player/dash_echo.gd" id="script"]
+[ext_resource type="Shader" path="res://scenes/shaders/hit.gdshader" id="flash"]
+
+[sub_resource type="ShaderMaterial" id="SilverEcho"]
+shader = ExtResource("flash")
+shader_parameter/flash_amount = 0.28
+shader_parameter/status_tint = Color(0.74, 0.54, 0.98, 0.9)
+
+[node name="DashEcho" type="Sprite2D"]
+top_level = true
+modulate = Color(0.8, 0.72, 1, 0.44)
+material = SubResource("SilverEcho")
+script = ExtResource("script")
