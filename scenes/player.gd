@@ -41,6 +41,11 @@ const INVULNERABILITY_TIME := 1.5
 const BLINK_INTERVAL := 0.1
 const HIT_FLASH_TIME := 0.2
 
+# Мокрая ведьма (после болотной воды): медленнее и получает двойной урон от электричества угря
+const WET_TIME := 3.0
+const WET_SPEED_MULTIPLIER := 0.7
+const WET_TINT := Color(0.22, 0.44, 1.0, 0.6)
+
 @export var has_book_and_wand := true:
 	set(value):
 		has_book_and_wand = value
@@ -73,6 +78,7 @@ var dash_cooldown_left := 0.0
 var shoot_cooldown_left := 0.0
 var invulnerable_left := 0.0
 var flash_material := HitMaterial.new()
+var wet_left := 0.0
 
 
 func _ready() -> void:
@@ -286,6 +292,8 @@ func can_shoot() -> bool:
 
 func apply_horizontal_movement() -> void:
 	velocity.x = direction_x * SPEED * _stat_multiplier(&"speed")
+	if is_wet():
+		velocity.x *= WET_SPEED_MULTIPLIER
 
 
 func apply_gravity(delta: float) -> void:
@@ -388,6 +396,7 @@ func update_timers(delta: float) -> void:
 			state = State.NORMAL
 
 	update_invulnerability(delta)
+	update_wet(delta)
 
 
 func update_ground_state() -> void:
@@ -404,3 +413,24 @@ func update_ground_state() -> void:
 			jumps_left = max_jumps - 1
 		if velocity.y >= 0.0:
 			is_jumping = false
+
+
+# --- Мокрая ведьма ---
+
+func make_wet() -> void:
+	if state == State.DEAD:
+		return
+	wet_left = WET_TIME
+	flash_material.set_shader_parameter("status_tint", WET_TINT)
+
+
+func is_wet() -> bool:
+	return wet_left > 0.0
+
+
+func update_wet(delta: float) -> void:
+	if wet_left <= 0.0:
+		return
+	wet_left -= delta
+	if wet_left <= 0.0:
+		flash_material.set_shader_parameter("status_tint", Color(1, 1, 1, 0))
