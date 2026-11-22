@@ -42,7 +42,7 @@ func update(delta):
 				timer = 0.0
 		Phase.COOLDOWN:
 			enemy.velocity.x = 0
-			enemy.anim.play("idle")
+			enemy.anim.play("confused")
 			if timer > attackCoolDown:
 				if enemy.distanceBetween() < enemy.attackRange:
 					startWindup()

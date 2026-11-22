@@ -1,0 +1,28 @@
+[gd_scene format=3 uid="uid://dl7lewgqvqirb"]
+
+[ext_resource type="PackedScene" uid="uid://cfq8y8hbuprai" path="res://scenes/enemies/base_enemy.tscn" id="1_w0lsw"]
+[ext_resource type="Script" uid="uid://bitr0nhp7brk" path="res://scenes/enemies/states/idle.gd" id="2_8cp7y"]
+[ext_resource type="Script" uid="uid://b27a2o705mcpa" path="res://scenes/enemies/states/patrol.gd" id="3_eckuk"]
+[ext_resource type="Script" uid="uid://cucxkrtompmlp" path="res://scenes/enemies/states/chase.gd" id="4_qi0qm"]
+[ext_resource type="Script" uid="uid://cnd2v84pn8qs4" path="res://scenes/enemies/states/attack.gd" id="5_8o634"]
+
+[node name="mudSlime" unique_id=991394093 instance=ExtResource("1_w0lsw")]
+maxHealth = 6
+
+[node name="AnimatedSprite2D" parent="." index="2" unique_id=1069897540]
+animation = &"idle"
+
+[node name="StateMachine" parent="." index="4" unique_id=478916629 node_paths=PackedStringArray("initialState")]
+initialState = NodePath("Idle")
+
+[node name="Idle" type="Node" parent="StateMachine" index="0" unique_id=1945929380]
+script = ExtResource("2_8cp7y")
+
+[node name="Patrol" type="Node" parent="StateMachine" index="1" unique_id=157125280]
+script = ExtResource("3_eckuk")
+
+[node name="Chase" type="Node" parent="StateMachine" index="2" unique_id=1464841635]
+script = ExtResource("4_qi0qm")
+
+[node name="Attack" type="Node" parent="StateMachine" index="3" unique_id=402482023]
+script = ExtResource("5_8o634")

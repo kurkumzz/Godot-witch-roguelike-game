@@ -19,6 +19,7 @@ var isHitted := false
 #отбрасывание (перегрузка и другие эффекты). Перебивает скорость от состояний
 var knockback_velocity := 0.0
 var knockback_decay := 0.0
+@export var immovable := false  
 
 const ENEMY_GROUP := &"enemies"
 const ALERT_RANGE_BONUS := 50.0
@@ -82,7 +83,7 @@ func receive_projectile(element: Element.Type, damage_amount: int, direction: Ve
 	if isDead:
 		return
 	# Сохраняем импульс перегрузки, если следующий снаряд попал вдогонку.
-	if absf(knockback_velocity) < HIT_PUSH_SPEED:
+	if not immovable and absf(knockback_velocity) < HIT_PUSH_SPEED:
 		knockback_velocity = signf(direction.x) * HIT_PUSH_SPEED
 		knockback_decay = HIT_PUSH_DECAY
 	isHitted = true
@@ -107,6 +108,8 @@ func die() -> void:
 ## Отбрасывание: force.x - горизонтальная скорость (знак = направление),
 ## force.y - вертикальный подброс (отрицательное = вверх), decay - как быстро гаснет x.
 func apply_knockback(force: Vector2, decay := 800.0) -> void:
+	if immovable:
+		return
 	knockback_velocity = force.x
 	knockback_decay = decay
 	velocity.y = force.y

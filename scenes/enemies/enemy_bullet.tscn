@@ -1,0 +1,17 @@
+[gd_scene format=3 uid="uid://dsgncb0swj2vl"]
+
+[ext_resource type="Script" uid="uid://cx4lfc5pgqenh" path="res://enemy_bullet.gd" id="1_gl7bs"]
+[ext_resource type="Texture2D" uid="uid://c40m7c1l8sabp" path="res://graphics/particles/spark.svg" id="2_mgp66"]
+
+[sub_resource type="RectangleShape2D" id="RectangleShape2D_1puhw"]
+
+[node name="enemyBullet" type="Area2D" unique_id=524616416]
+collision_layer = 0
+collision_mask = 3
+script = ExtResource("1_gl7bs")
+
+[node name="Sprite2D" type="Sprite2D" parent="." unique_id=2104510592]
+texture = ExtResource("2_mgp66")
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="." unique_id=1449481011]
+shape = SubResource("RectangleShape2D_1puhw")
