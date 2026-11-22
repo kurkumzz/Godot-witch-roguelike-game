@@ -1,0 +1,33 @@
+[gd_scene format=3 uid="uid://d2yrba0gw8xrq"]
+
+[ext_resource type="Script" uid="uid://cjl8pnisqg0rq" path="res://generation/swamp_run.gd" id="1_2qd5i"]
+[ext_resource type="PackedScene" path="res://generation/swamp_background.tscn" id="1_krsb0"]
+[ext_resource type="PackedScene" uid="uid://geegx138cdxf" path="res://scenes/player.tscn" id="2_2qd5i"]
+[ext_resource type="PackedScene" uid="uid://creddcbhtj2aj" path="res://levels/swamp/start_1.tscn" id="2_ant70"]
+[ext_resource type="PackedScene" uid="uid://bhpj2pb3710gr" path="res://levels/swamp/exit_01.tscn" id="3_ruhe2"]
+[ext_resource type="PackedScene" uid="uid://buatv314g8es3" path="res://levels/swamp/easy_1.tscn" id="4_5frec"]
+[ext_resource type="PackedScene" uid="uid://bso3sbr2ul8x5" path="res://levels/swamp/easy_2.tscn" id="5_peef7"]
+[ext_resource type="PackedScene" uid="uid://0ql6s2h3faub" path="res://levels/swamp/easy_3.tscn" id="6_gqqst"]
+[ext_resource type="PackedScene" uid="uid://bg4iidtdi8no5" path="res://levels/swamp/medium_1.tscn" id="7_dr0am"]
+[ext_resource type="PackedScene" uid="uid://b5xq0gj7vs3og" path="res://levels/swamp/medium_2.tscn" id="8_pjge0"]
+[ext_resource type="PackedScene" uid="uid://cp8sepg6kjaq4" path="res://levels/swamp/medium_3.tscn" id="9_5co87"]
+[ext_resource type="PackedScene" uid="uid://dccmkrf27v5vi" path="res://levels/swamp/hard-1.tscn" id="10_qanpw"]
+[ext_resource type="PackedScene" uid="uid://ds1wjdakirfr8" path="res://levels/swamp/rest.tscn" id="11_fielj"]
+[ext_resource type="PackedScene" uid="uid://bsid8ojgc077k" path="res://levels/swamp/empty.tscn" id="12_c3vo5"]
+[ext_resource type="PackedScene" uid="uid://cq43nkk8i8eed" path="res://levels/swamp/special.tscn" id="13_vjyxl"]
+
+[node name="SwampRun" type="Node2D" unique_id=247406063]
+script = ExtResource("1_2qd5i")
+startRooms = Array[PackedScene]([ExtResource("2_ant70")])
+exitRooms = Array[PackedScene]([ExtResource("3_ruhe2")])
+easyRooms = Array[PackedScene]([ExtResource("4_5frec"), ExtResource("5_peef7"), ExtResource("6_gqqst")])
+mediumRooms = Array[PackedScene]([ExtResource("7_dr0am"), ExtResource("8_pjge0"), ExtResource("9_5co87")])
+hardRooms = Array[PackedScene]([ExtResource("10_qanpw")])
+calmRooms = Array[PackedScene]([ExtResource("11_fielj"), ExtResource("12_c3vo5"), ExtResource("13_vjyxl")])
+
+[node name="SwampParal" parent="." unique_id=907621136 instance=ExtResource("1_krsb0")]
+
+[node name="Rooms" type="Node2D" parent="." unique_id=401671351]
+
+[node name="player" parent="." unique_id=1179664223 instance=ExtResource("2_2qd5i")]
+position = Vector2(324, 340)

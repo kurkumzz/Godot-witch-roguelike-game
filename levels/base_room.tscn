@@ -1,0 +1,20 @@
+[gd_scene format=3 uid="uid://dcxbg8t1iw5hr"]
+
+[ext_resource type="Script" uid="uid://bph50irkqq2bh" path="res://levels/base_room.gd" id="1_1yka1"]
+[ext_resource type="TileSet" uid="uid://cj30p0h5kny56" path="res://swamp_tileset.tres" id="1_ew5uy"]
+
+[node name="base_room" type="Node2D" unique_id=559751060]
+script = ExtResource("1_1yka1")
+
+[node name="Ground" type="TileMapLayer" parent="." unique_id=784940141]
+tile_set = ExtResource("1_ew5uy")
+
+[node name="Decor" type="TileMapLayer" parent="." unique_id=1454650193]
+tile_set = ExtResource("1_ew5uy")
+collision_enabled = false
+
+[node name="Spawns" type="Node2D" parent="." unique_id=139460044]
+
+[node name="Bounds" type="ReferenceRect" parent="." unique_id=531077791]
+offset_right = 1280.0
+offset_bottom = 552.0
