@@ -5,6 +5,7 @@
 [ext_resource type="Script" uid="uid://b27a2o705mcpa" path="res://scenes/enemies/states/patrol.gd" id="3_eckuk"]
 [ext_resource type="Script" uid="uid://cucxkrtompmlp" path="res://scenes/enemies/states/chase.gd" id="4_qi0qm"]
 [ext_resource type="Script" uid="uid://cnd2v84pn8qs4" path="res://scenes/enemies/states/attack.gd" id="5_8o634"]
+[ext_resource type="AudioStream" path="res://sounds/other/SlimeJump.wav" id="snd_dash"]
 
 [node name="mudSlime" unique_id=991394093 instance=ExtResource("1_w0lsw")]
 maxHealth = 6
@@ -26,3 +27,4 @@ script = ExtResource("4_qi0qm")
 
 [node name="Attack" type="Node" parent="StateMachine" index="3" unique_id=402482023]
 script = ExtResource("5_8o634")
+dashSound = ExtResource("snd_dash")

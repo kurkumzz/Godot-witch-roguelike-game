@@ -5,6 +5,13 @@
 [ext_resource type="PackedScene" path="res://scenes/effects/player/staff_glow.tscn" id="glow"]
 [ext_resource type="Script" path="res://scenes/effects/player/movement_feedback.gd" id="motion"]
 [ext_resource type="Script" path="res://scenes/effects/player/hit_feedback.gd" id="hit"]
+[ext_resource type="Script" path="res://scenes/effects/player/player_sounds.gd" id="sounds_script"]
+[ext_resource type="AudioStream" path="res://sounds/witch/shoot.ogg" id="snd_shoot"]
+[ext_resource type="AudioStream" path="res://sounds/witch/jump.wav" id="snd_jump"]
+[ext_resource type="AudioStream" path="res://sounds/witch/ground.wav" id="snd_land"]
+[ext_resource type="AudioStream" path="res://sounds/witch/hurt1.mp3" id="snd_hurt"]
+[ext_resource type="AudioStream" path="res://sounds/witch/deadGAMEOVER.wav" id="snd_death"]
+[ext_resource type="AudioStream" path="res://sounds/other/dash.wav" id="snd_dash"]
 [ext_resource type="Texture2D" uid="uid://tao6r8ugcgtx" path="res://graphics/characters/ggSprite.png" id="2_qhqgy"]
 
 [sub_resource type="RectangleShape2D" id="RectangleShape2D_2ktqi"]
@@ -307,6 +314,15 @@ script = ExtResource("motion")
 
 [node name="HitFeedback" type="Node" parent="."]
 script = ExtResource("hit")
+
+[node name="Sounds" type="Node" parent="."]
+script = ExtResource("sounds_script")
+shoot_sound = ExtResource("snd_shoot")
+jump_sound = ExtResource("snd_jump")
+land_sound = ExtResource("snd_land")
+hurt_sound = ExtResource("snd_hurt")
+death_sound = ExtResource("snd_death")
+dash_sound = ExtResource("snd_dash")
 
 [connection signal="jumped" from="." to="MovementFeedback" method="on_jump"]
 [connection signal="landed" from="." to="MovementFeedback" method="on_land"]

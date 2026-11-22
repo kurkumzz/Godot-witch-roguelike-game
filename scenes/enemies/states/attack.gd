@@ -11,6 +11,7 @@ var dashDir: float
 @export var attackCoolDown: float = 1.0
 
 @export var dashDistance: float = 100.0
+@export var dashSound: AudioStream
 var currentDashVelocity: float
 var dashDeceleration: float
 
@@ -28,6 +29,7 @@ func update(delta):
 				phase = Phase.DASH
 				timer = 0.0
 				enemy.anim.play("attack")
+				enemy.playSound(dashSound)
 				
 				var averageSpeed = dashDistance / dashTime
 				currentDashVelocity = averageSpeed * 2  

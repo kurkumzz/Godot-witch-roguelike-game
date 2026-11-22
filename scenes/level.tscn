@@ -6,6 +6,7 @@
 [ext_resource type="PackedScene" uid="uid://d2yrba0gw8xrq" path="res://generation/SwampRun.tscn" id="SwampRun"]
 
 [node name="level" unique_id=612394683 instance=ExtResource("SwampRun")]
+position = Vector2(2, 0)
 script = ExtResource("script_level")
 
 [node name="AmbientLight" type="CanvasModulate" parent="." index="3" unique_id=542599714]

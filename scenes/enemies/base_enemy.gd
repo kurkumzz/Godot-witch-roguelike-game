@@ -39,6 +39,10 @@ var flash_material := HitMaterial.new()
 @export var deadZone: float = 10.0
 @export var attackRange: float = 100.0
 
+#звуки
+@export var hurtSound: AudioStream
+@export var deathSound: AudioStream
+
 
 #гет компоненты
 @onready var anim: AnimatedSprite2D = $AnimatedSprite2D
@@ -98,10 +102,12 @@ func takeDamage(amount: int) -> void:
 	if(health <= 0):
 		die()
 		return
+	playSound(hurtSound)
 	flash_material.flash(anim, HIT_FLASH_TIME)
 
 func die() -> void:
 	isDead = true
+	playSound(deathSound)
 	died.emit()
 	queue_free()
 
@@ -149,3 +155,17 @@ func detects_player() -> bool:
 		isHitted = false
 		return true
 	return false
+
+## Проигрывает звук в точке врага. Плеер добавляем в уровень, а не во врага:
+## иначе звук смерти оборвётся вместе с queue_free().
+func playSound(stream: AudioStream, pitchSpread := 0.1) -> void:
+	if stream == null:
+		return
+	var sound := AudioStreamPlayer2D.new()
+	sound.stream = stream
+	sound.bus = &"SFX"
+	sound.pitch_scale = randf_range(1.0 - pitchSpread, 1.0 + pitchSpread)
+	get_parent().add_child(sound)
+	sound.global_position = global_position
+	sound.finished.connect(sound.queue_free)
+	sound.play()

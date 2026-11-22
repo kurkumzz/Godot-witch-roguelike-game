@@ -11,6 +11,7 @@ var shootDir: float
 
 @export var windupTime: float = 0.4
 @export var attackCoolDown: float = 1.5
+@export var chargeSound: AudioStream
 @export var muzzleOffset := Vector2(16, -4)   # откуда вылетает снаряд относительно угря
 
 func enter():
@@ -48,6 +49,7 @@ func startWindup():
 	shootDir = enemy.currentDir(enemy.player.global_position.x)
 	enemy.flipSprite(shootDir)
 	enemy.anim.play("windup")
+	enemy.playSound(chargeSound)
 
 func shoot():
 	# 1. создаём новый снаряд из сцены

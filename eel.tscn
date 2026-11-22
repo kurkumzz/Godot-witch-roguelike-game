@@ -5,6 +5,7 @@
 [ext_resource type="Script" uid="uid://b5ye87lcubtlh" path="res://scenes/enemies/states/eel_idle.gd" id="2_tvbcf"]
 [ext_resource type="Script" uid="uid://dfvim55n4oymk" path="res://scenes/enemies/states/eel_attack.gd" id="3_abiyp"]
 [ext_resource type="Texture2D" uid="uid://g1n57e7a84t2" path="res://graphics/enemies/mudSlime.png" id="3_my5qu"]
+[ext_resource type="AudioStream" path="res://sounds/other/chargeEel.wav" id="snd_charge"]
 
 [sub_resource type="RectangleShape2D" id="RectangleShape2D_my5qu"]
 size = Vector2(16, 36)
@@ -257,3 +258,4 @@ script = ExtResource("2_tvbcf")
 
 [node name="Attack" type="Node" parent="StateMachine" index="1" unique_id=482641433]
 script = ExtResource("3_abiyp")
+chargeSound = ExtResource("snd_charge")

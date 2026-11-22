@@ -22,6 +22,7 @@ config/icon="res://icon.svg"
 [autoload]
 
 RunState="*res://scenes/run_state.gd"
+Music="*res://scenes/music.gd"
 
 [display]
 

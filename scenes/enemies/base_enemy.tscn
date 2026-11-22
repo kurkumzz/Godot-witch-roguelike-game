@@ -5,6 +5,8 @@
 [ext_resource type="Script" uid="uid://b6wrwbrmeecoa" path="res://scenes/enemies/state_machine.gd" id="3_lkvl6"]
 [ext_resource type="Script" uid="uid://cjwmqjft784fg" path="res://scenes/enemies/status.gd" id="6_2t7ph"]
 [ext_resource type="Script" uid="uid://bhw0cim1qmvlg" path="res://scenes/effects/reactions/status_visuals.gd" id="8_visuals"]
+[ext_resource type="AudioStream" path="res://sounds/other/hurtEnemy.ogg" id="snd_hurt"]
+[ext_resource type="AudioStream" path="res://sounds/other/enemyDead.wav" id="snd_dead"]
 
 [sub_resource type="RectangleShape2D" id="RectangleShape2D_1puhw"]
 size = Vector2(27, 35)
@@ -199,6 +201,8 @@ size = Vector2(23, 22)
 [node name="base_enemy" type="CharacterBody2D" unique_id=991394093 groups=["enemy"]]
 collision_layer = 4
 script = ExtResource("1_cjhsq")
+hurtSound = ExtResource("snd_hurt")
+deathSound = ExtResource("snd_dead")
 
 [node name="Label" type="Label" parent="." unique_id=1157116799]
 offset_left = -24.0
